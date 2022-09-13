@@ -1,19 +1,15 @@
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import permissions
 from rest_framework import viewsets
+from rest_framework import views
 
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
-
-from api import settings
-
-from .permissions import ReactPermission, ApiPermission
 
 from .util import (get_time_inteval,
     get_time_range,
@@ -23,6 +19,8 @@ from .util import (get_time_inteval,
 from .tasks import set_data
 
 from .serializers import (
+    UserSerializer,
+    LoginSerializer,
     PVDataSerializer,
     PVStringSerializer,
     PVDataMeteorologicalSerializer,
@@ -34,6 +32,7 @@ from .serializers import (
     YieldMinuteSerializer,
     AlertTresholdSerializer,
     SettingaSerializer)
+
 from .models import (
     PVData,
     PVString,
@@ -47,10 +46,99 @@ from .models import (
 
 # Create your views here.
 
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    @action(methods=['GET'], url_path='profile', detail=False)
+    def profile(self, request):
+        return Response(UserSerializer(request.user).data)
+
+    @action(methods=['POST'], url_path='createuser', detail=False)
+    def create_user(self, request):
+        request_data = request.data
+
+        try:
+            user = User.objects.create(
+                first_name=request_data['first_name'],
+                last_name=request_data['last_name'],
+                username=request_data['username'],
+                email=request_data['email'],
+                is_staff=True,
+                is_superuser=False,
+            )
+            user.set_password(request_data['password'])
+
+            user.save()
+        except:
+            return Response(status=400)
+
+        return Response(status=200)
+
+    @action(methods=['DELETE'], url_path='deactivateuser', detail=False)
+    def deactivate_user(self, request):
+        request_data = request.data
+
+        try:
+            user = User.objects.get(username=request_data['username'])
+            user.is_active = False
+            user.save()
+        except:
+            return Response(status=400)
+
+        return Response(status=200)
+
+    @action(methods=['POST'], url_path='edituser', detail=False)
+    def edit_user(self, request):
+        request_data = request.data
+
+        try:
+            user = User.objects.get(username=request_data['username'])
+            
+            if request_data['new_username']:
+                user.username = request_data['new_username']
+            if request_data['first_name']:
+                user.first_name = request_data['first_name']
+            if request_data['last_name']:
+                user.last_name = request_data['last_name']
+            if request_data['email']:
+                user.email = request_data['email']
+            if request_data['password']:
+                user.set_password(request_data['password'])
+
+            user.save()
+        except:
+            return Response(status=400)
+
+        return Response(status=200)
+
+class AccountsViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+
+    @action(methods=['POST'], url_path='login', detail=False)
+    def login_(self, request):
+        serializer = LoginSerializer(data=request.data, context={ 'request': request })
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return Response(status=202)
+
+    @action(methods=['POST'], url_path='logout', detail=False)
+    def logout_(self, request):
+        logout(request)
+        return Response(status=202)
+
+    @action(methods=['GET'], url_path='token', detail=False)
+    def get_token(self, request):
+        serializer = LoginSerializer(data=request.data, context={ 'request': request })
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key
+        })
+
 class PVDataViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = PVData.objects.all()
     serializer_class = PVDataSerializer
@@ -117,9 +205,6 @@ class PVDataViewSet(viewsets.ModelViewSet):
         return Response(PVDataSerializer(pv_data, many=True).data)
 
 class PVStringViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = PVString.objects.all()
     serializer_class = PVStringSerializer
@@ -134,9 +219,6 @@ class PVStringViewSet(viewsets.ModelViewSet):
         return Response(PVStringSerializer(pv_data, many=True).data)
 
 class PowerForecastViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = PowerForecast.objects.all()
     serializer_class = PowerForecastSerializer
@@ -164,9 +246,6 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
         return Response(PowerForecastSerializer(forecast_data, many=True).data)
 
 class YieldDayViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = YieldDay.objects.all()
     serializer_class = YieldDaySerializer
@@ -195,9 +274,6 @@ class YieldDayViewSet(viewsets.ModelViewSet):
         return Response(YieldDaySerializer(yield_data, many=True).data)
 
 class YieldMonthViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = YieldMonth.objects.all()
     serializer_class = YieldMonthSerializer
@@ -221,9 +297,6 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
         return Response(YieldMonthSerializer(yield_data, many=True).data)
 
 class YieldYearViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = YieldYear.objects.all()
     serializer_class = YieldYearSerializer
@@ -247,9 +320,6 @@ class YieldYearViewSet(viewsets.ModelViewSet):
         return Response(YieldYearSerializer(yield_data, many=True).data)
 
 class YieldMinuteViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = YieldMinute.objects.all()
     serializer_class = YieldMinuteSerializer
@@ -272,17 +342,11 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         return Response(YieldMinuteSerializer(yield_data, many=True).data)
 
 class AlertTresholdViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = AlertTreshold.objects.all()
     serializer_class = AlertTresholdSerializer
 
 class SettingsViewSet(viewsets.ModelViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ReactPermission]
     
     queryset = Settings.objects.all()
     serializer_class = SettingaSerializer
@@ -342,9 +406,6 @@ class SettingsViewSet(viewsets.ModelViewSet):
         return Response({'days_left': st.days_left})
 
 class ExternalAPIViweSet(viewsets.ViewSet):
-    if not settings.DEBUG:
-        authentication_classes = [TokenAuthentication]
-        permission_classes = [IsAuthenticated, ApiPermission]
 
     @action(methods=['POST'], url_path='postdata', detail=False)
     def post_data(self, request):
@@ -364,17 +425,3 @@ class ExternalAPIViweSet(viewsets.ViewSet):
             return Response(status=400)
 
         return Response(status=200)
-
-class CustomAuthToken(ObtainAuthToken):
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'email': user.email
-        })
