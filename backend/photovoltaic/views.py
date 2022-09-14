@@ -1,9 +1,10 @@
+import re
+
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import viewsets
-from rest_framework import views
 
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
@@ -11,10 +12,14 @@ from django.contrib.auth import login, logout
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
+from api import settings
+
 from .util import (get_time_inteval,
     get_time_range,
     get_string_number,
-    generate_forecast_json)
+    generate_forecast_json,
+    timestamp_aware,
+    stringify_datetime)
 
 from .tasks import set_data
 
@@ -135,7 +140,8 @@ class AccountsViewSet(viewsets.ViewSet):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({
-            'token': token.key
+            'token': token.key,
+            'timezone': settings.TIME_ZONE
         })
 
 class PVDataViewSet(viewsets.ModelViewSet):
@@ -147,8 +153,8 @@ class PVDataViewSet(viewsets.ModelViewSet):
     def pv_system_status(self, request):
         latest_data = PVDataSerializer(PVData.objects.latest('timestamp')).data
 
-        time_now = datetime.now()
-        time_data = datetime.strptime(latest_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        time_now = timestamp_aware()
+        time_data = datetime.strptime(latest_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
         delta = time_now - time_data
         minutes = delta / timedelta(minutes=1)
 
@@ -176,10 +182,10 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='meteorologicalday', detail=False)
     def meteorological_day(self, request):
-        now = datetime.now()
-        datetime_lte = now.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
+        now = timestamp_aware()
+        datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(days=1)
-        datetime_gte = yesterday.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = stringify_datetime(yesterday)
         day_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(PVDataMeteorologicalSerializer(day_data, many=True).data)
@@ -188,10 +194,10 @@ class PVDataViewSet(viewsets.ModelViewSet):
     def power_day(self, request):
         time_interval = get_time_inteval(request)
 
-        now = datetime.now()
-        datetime_lte = now.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
+        now = timestamp_aware()
+        datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(minutes=time_interval)
-        datetime_gte = yesterday.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = stringify_datetime(yesterday)
         power_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(PVDataPowerSerializer(power_data, many=True).data)
@@ -227,10 +233,10 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
     def forecast_day(self, request):
         time_interval = get_time_inteval(request)
 
-        now = datetime.now()
-        datetime_lte = now.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
+        now = timestamp_aware()
+        datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(minutes=time_interval+1)
-        datetime_gte = yesterday.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = stringify_datetime(yesterday)
         power_forecast = PowerForecast.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         forecast_json = generate_forecast_json(PowerForecastSerializer(power_forecast, many=True).data)
@@ -257,10 +263,10 @@ class YieldDayViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='latest15', detail=False)
     def yield_latest_15(self, request):
-        now = datetime.now()
-        datetime_lte = now.strftime('%Y-%m-%dT23:59:59.999999-03:00')
+        now = timestamp_aware()
+        datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(days=15)
-        datetime_gte = yesterday.strftime('%Y-%m-%dT00:00:00.000000-03:00')
+        datetime_gte = stringify_datetime(yesterday)
         yield_days = YieldDay.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldDaySerializer(yield_days, many=True).data)
@@ -280,10 +286,10 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='latest12', detail=False)
     def yield_latest_12(self, request):
-        now = datetime.now()
-        datetime_lte = now.strftime('%Y-%m-%dT23:59:59.999999-03:00')
+        now = timestamp_aware()
+        datetime_lte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
         yesterday = now - relativedelta(months=12)
-        datetime_gte = yesterday.strftime('%Y-%m-01T00:00:00.000000-03:00')
+        datetime_gte = re.sub(r'\d\dT\d\d:\d\d:\d\d.\d+', '01T00:00:00.000000', stringify_datetime(yesterday))
         yield_months = YieldMonth.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldMonthSerializer(yield_months, many=True).data)
@@ -303,10 +309,10 @@ class YieldYearViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='latest10', detail=False)
     def yield_latest_10(self, request):
-        now = datetime.now()
-        datetime_lte = now.strftime('%Y-%m-%dT23:59:59.999999-03:00')
+        now = timestamp_aware()
+        datetime_lte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
         yesterday = now - relativedelta(months=120)
-        datetime_gte = yesterday.strftime('%Y-01-01T00:00:00.000000-03:00')
+        datetime_gte = re.sub(r'\d\d-\d\dT\d\d:\d\d:\d\d.\d+', '01-01T00:00:00.000000', stringify_datetime(yesterday))
         yield_year = YieldYear.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldYearSerializer(yield_year, many=True).data)
@@ -326,9 +332,9 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='today', detail=False)
     def yield_today(self, request):
-        now = datetime.now()
-        datetime_lte = now.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = now.strftime('%Y-%m-%dT00:00:00.000000-03:00')
+        now = timestamp_aware()
+        datetime_lte = stringify_datetime(now)
+        datetime_gte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
         yield_today = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldMinuteSerializer(yield_today, many=True).data)

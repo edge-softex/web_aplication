@@ -1,3 +1,4 @@
+import string
 import pandas as pd
 from pytz import timezone
 from datetime import datetime, timedelta
@@ -36,8 +37,8 @@ def get_time_inteval(request):
     return int(request.GET.get('time_interval', 10))
 
 def get_time_range(request):
-    time_end = request.GET.get('time_end', datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'))
-    time_begin = request.GET.get('time_begin', (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'))
+    time_end = request.GET.get('time_end', stringify_datetime(timestamp_aware()))
+    time_begin = request.GET.get('time_begin', stringify_datetime(timestamp_aware() - timedelta(days=1)))
     return time_begin, time_end
 
 def get_string_number(request):
@@ -58,46 +59,39 @@ def generate_forecast_json(data):
         json_array.append(json_data)
 
     latest_data = data[length-1]
-    datetime_forecast = datetime.strptime(latest_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f-03:00')
+    datetime_forecast = datetime.strptime(latest_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
 
     datetime_forecast = datetime_forecast + timedelta(minutes=1)
     json_array.append({
-        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'timestamp': stringify_datetime(datetime_forecast),
         'forecast': latest_data['t1']
     })
 
     datetime_forecast = datetime_forecast + timedelta(minutes=1)
     json_array.append({
-        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'timestamp': stringify_datetime(datetime_forecast),
         'forecast': latest_data['t2']
     })
 
     datetime_forecast = datetime_forecast + timedelta(minutes=1)
     json_array.append({
-        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'timestamp': stringify_datetime(datetime_forecast),
         'forecast': latest_data['t3']
     })
 
     datetime_forecast = datetime_forecast + timedelta(minutes=1)
     json_array.append({
-        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'timestamp': stringify_datetime(datetime_forecast),
         'forecast': latest_data['t4']
     })
 
     datetime_forecast = datetime_forecast + timedelta(minutes=1)
     json_array.append({
-        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'timestamp': stringify_datetime(datetime_forecast),
         'forecast': latest_data['t5']
     })
 
     return json_array
-
-def timestamp_aware(timestamp_string):
-    tz = timezone(settings.TIME_ZONE)
-    datetime_native = datetime.strptime(timestamp_string, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-    datetime_aware = tz.localize(datetime_native)
-
-    return datetime_aware
 
 def alert_definition(alert_type, string_number, meteorological_value, value):
     st = Settings.objects.get_or_create(id=1)
@@ -118,3 +112,12 @@ def alert_definition(alert_type, string_number, meteorological_value, value):
         alert = 'NR'
 
     return alert
+
+def timestamp_aware():
+    tz = timezone(settings.TIME_ZONE)
+    datetime_aware = tz.localize(datetime.now())
+
+    return datetime_aware
+
+def stringify_datetime(datetime):
+    return str(datetime).replace(' ', 'T')
