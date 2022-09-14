@@ -254,4 +254,25 @@ def set_data(self, request_data):
     yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
     yield_year.save()
 
-    #TODO run power prediction model
+    instant_power_forecast.apply_async(args=[data_timestamp], kwargs={}, queue='run_models')
+
+@shared_task(bind=True, max_retries=3)
+def instant_power_forecast(self, timestamp):
+    #Get data
+    datetime_gte = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f%z')
+    datetime_gte = datetime_gte - timedelta(minutes=120)
+    data = PVData.objects.filter(timestamp__gte=stringify_datetime(datetime_gte), timestamp__lte=timestamp)
+    iradiation = data.values_list('irradiation', flat=True)
+    temperature_pv = data.values_list('temperature_pv', flat=True)
+    power_avr = data.values_list('power_avg', flat=True)
+
+    #TODO call model
+
+    #Insert forecast into db
+    p1 = p2 = p3 = p4 = p5 = None
+    pf = PowerForecast.objects.create(timestamp=timestamp,
+                                    t1=p1,
+                                    t2=p2,
+                                    t3=p3,
+                                    t4=p4,
+                                    t5=p5)
