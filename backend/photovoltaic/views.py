@@ -19,7 +19,8 @@ from .util import (get_time_inteval,
     get_string_number,
     generate_forecast_json,
     timestamp_aware,
-    stringify_datetime)
+    stringify_datetime,
+    createLog)
 
 from .tasks import set_data
 
@@ -36,7 +37,8 @@ from .serializers import (
     YieldYearSerializer,
     YieldMinuteSerializer,
     AlertTresholdSerializer,
-    SettingaSerializer)
+    SettingaSerializer,
+    LogSerializer)
 
 from .models import (
     PVData,
@@ -47,7 +49,8 @@ from .models import (
     YieldYear,
     YieldMinute,
     AlertTreshold,
-    Settings)
+    Settings,
+    Log)
 
 # Create your views here.
 
@@ -372,6 +375,8 @@ class SettingsViewSet(viewsets.ModelViewSet):
             st.delt_cr = request.data['delt_cr']
 
             st.save()
+            createLog(title='System settings changed.',
+                    message = '{username} changed alert settings.'.format(username=request.user.username))
         except:
             return Response(status=400)
 
@@ -386,6 +391,8 @@ class SettingsViewSet(viewsets.ModelViewSet):
             st.fault_user_active = request.data['fault_user_active']
             st.warning_user_active = request.data['warning_user_active']
             st.save()
+            createLog(title='System settings changed.',
+                    message = '{username} changed whether alerts are active or not.'.format(username=request.user.username))
         except:
             return Response(status=400)
 
@@ -399,6 +406,8 @@ class SettingsViewSet(viewsets.ModelViewSet):
         try:
             st.retraining_interval = request.data['retraining_interval']
             st.save()
+            createLog(title='System settings changed.',
+                    message = '{username} changed the training interval of the models.'.format(username=request.user.username))
         except:
             return Response(status=400)
 
@@ -410,6 +419,19 @@ class SettingsViewSet(viewsets.ModelViewSet):
         st, created = Settings.objects.get_or_create(id=1)
 
         return Response({'days_left': st.days_left})
+
+class LogViewSet(viewsets.ModelViewSet):
+
+    queryset = Log.objects.all()
+    serializer_class = LogSerializer
+
+    @action(methods=['GET'], url_path='history', detail=False)
+    def log_history(self, request):
+        time_begin, time_end = get_time_range(request)
+
+        yield_data = Log.objects.filter(created_at__gte=time_begin, created_at__lte=time_end)
+
+        return Response(YieldMinuteSerializer(yield_data, many=True).data)
 
 class ExternalAPIViweSet(viewsets.ViewSet):
 

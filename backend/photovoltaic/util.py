@@ -1,10 +1,12 @@
+from email import message
+import numbers
 import pandas as pd
 from pytz import timezone
 from datetime import datetime, timedelta
 
 from api import settings
 
-from .models import AlertTreshold, Settings
+from .models import AlertTreshold, Settings, Log
 
 def read_dat_file(filename):
     """
@@ -92,6 +94,29 @@ def generate_forecast_json(data):
 
     return json_array
 
+def createAlertLog(self, alert, alert_type, string_number, value):
+    if alert == 'FT':
+        alert = 'FAULT'
+    elif alert == 'WA':
+        alert = 'WARNING'
+
+    if alert_type == 'VT':
+        alert_type = 'Voltage'
+        mu = 'V'
+    elif alert_type == 'CR':
+        alert_type = 'Current'
+        mu = 'A'
+
+    title = 'Alert Activation.'
+    message = '{type} on String {number} has reached an {alert} level: {value} {mu}'.format(
+        type=alert_type, number=string_number, value=value, mu=mu)
+    self.createLog(title, message)
+
+def createLog(self, title, message):
+    log = Log.create(title=title, message=message)
+    log.save()
+
+
 def alert_definition(alert_type, string_number, meteorological_value, value):
     st = Settings.objects.get_or_create(id=1)
 
@@ -103,8 +128,10 @@ def alert_definition(alert_type, string_number, meteorological_value, value):
         if threshold and st.alert_days_active:
             if (value >= threshold.treshold_ft_max or value <= threshold.treshold_ft_min) and st.fault_user_active:
                 alert = 'FT'
+                createLog(alert, alert_type, string_number, value)
             elif (value >= threshold.treshold_wa_max or value <= threshold.treshold_wa_min) and st.warning_user_active:
                 alert = 'WA'
+                createLog(alert, alert_type, string_number, value)
             else:
                 alert = 'NM'
     except:

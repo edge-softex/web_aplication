@@ -7,3 +7,4 @@ from .yieldyear import  YieldYear
 from .yieldminute import YieldMinute
 from .alert_treshold import AlertTreshold
 from .settings import Settings
+from .log import Log

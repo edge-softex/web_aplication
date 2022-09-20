@@ -1,3 +1,5 @@
+from dataclasses import fields
+from pyexpat import model
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
@@ -11,7 +13,8 @@ from .models import (
     YieldYear,
     YieldMinute,
     AlertTreshold,
-    Settings
+    Settings,
+    Log
 )
 
 class UserSerializer(serializers.ModelSerializer):
@@ -116,3 +119,8 @@ class LoginSerializer(serializers.Serializer):
         # It will be used in the view.
         attrs['user'] = user
         return attrs
+
+class LogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Log
+        fields = '__all__'

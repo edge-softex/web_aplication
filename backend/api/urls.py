@@ -32,6 +32,7 @@ api_router.register(r'yieldyear', photovoltaic_views.YieldYearViewSet)
 api_router.register(r'yieldminute', photovoltaic_views.YieldMinuteViewSet)
 api_router.register(r'alerttreshold', photovoltaic_views.AlertTresholdViewSet)
 api_router.register(r'settings', photovoltaic_views.SettingsViewSet)
+api_router.register(r'log', photovoltaic_views.LogViewSet)
 api_router.register(r'external', photovoltaic_views.ExternalAPIViweSet, basename='external')
 
 external_router = routers.DefaultRouter()

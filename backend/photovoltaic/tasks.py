@@ -10,12 +10,16 @@ from api import settings
 
 from .util import read_dat_file, stringify_datetime, timestamp_aware, alert_definition
 
-from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertTreshold, Settings
+from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertTreshold, Settings, Log
 from photovoltaic.serializers import PVDataSerializer
 
-@shared_task(bind=True, max_retries=3)
+def createLog(self, exc, task_id, args, kwargs, einfo):
+    log = Log.create(title='Backend system error.', message='Task execution error {task}: {einfo}'.format(task=task_id, einfo=einfo))
+    log.save()
+
+@shared_task(bind=True, max_retries=3, on_failure=createLog)
 def simulate_input(self):
-    df = read_dat_file("./photovoltaic/fixtures/test_day.dat")
+    df = read_dat_file('./photovoltaic/fixtures/test_day.dat')
 
     tz = timezone(settings.TIME_ZONE)
     datetime_now = tz.localize(datetime.now())
@@ -25,7 +29,7 @@ def simulate_input(self):
 
     df_row = df.iloc[[index]]
 
-    s1 = PVString.objects.create(name="S1 " + datetime_string, 
+    s1 = PVString.objects.create(name='S1 ' + datetime_string, 
                                 timestamp=datetime_now,
                                 voltage=df_row['Tensao_S1_Avg'],
                                 current=df_row['Corrente_S1_Avg'],
@@ -34,7 +38,7 @@ def simulate_input(self):
                                 current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
                                 string_number=1)
     
-    s2 = PVString.objects.create(name="S2 " + datetime_string,
+    s2 = PVString.objects.create(name='S2 ' + datetime_string,
                                 timestamp=datetime_now,
                                 voltage=df_row['Tensao_S2_Avg'],
                                 current=df_row['Corrente_S2_Avg'],
@@ -82,7 +86,7 @@ def simulate_input(self):
 
     simulate_model.apply_async(args=[datetime_now, power1, power2, power3, power4, power5], kwargs={}, queue='run_models')
 
-@shared_task(bind=True, max_retries=3)
+@shared_task(bind=True, max_retries=3, on_failure=createLog)
 def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
     pf = PowerForecast.objects.create(timestamp=datetime_now,
                                     t1=power1 + random.uniform(0, 1.0),
@@ -92,7 +96,7 @@ def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
                                     t5=power5 + random.uniform(1.2, 2.2))
 
 
-@shared_task(bind=True, max_retries=3)
+@shared_task(bind=True, max_retries=3, on_failure=createLog)
 def calculate_alerts_tresholds(self):
     now = timestamp_aware()
     yesterday = now - timedelta(days=1)
@@ -175,7 +179,7 @@ def calculate_alerts_tresholds(self):
         st.save()
 
 
-@shared_task(bind=True, max_retries=3)
+@shared_task(bind=True, max_retries=3, on_failure=createLog)
 def set_data(self, request_data):
 
     strings_ref = []
@@ -199,7 +203,7 @@ def set_data(self, request_data):
             string_power = string['voltage'] * string['current']
         else:
             string_power = string['power']
-        string_obj = PVString.objects.create(name="S" + str(string['string_number']) + " " + request_data['timestamp'], 
+        string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
                                 timestamp=data_timestamp,
                                 voltage=string['voltage'],
                                 current=string['current'],
@@ -256,7 +260,7 @@ def set_data(self, request_data):
 
     instant_power_forecast.apply_async(args=[data_timestamp], kwargs={}, queue='run_models')
 
-@shared_task(bind=True, max_retries=3)
+@shared_task(bind=True, max_retries=3, on_failure=createLog)
 def instant_power_forecast(self, timestamp):
     #Get data
     datetime_gte = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f%z')
