@@ -1,5 +1,6 @@
 import re
 
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -51,6 +52,11 @@ from .models import (
     AlertTreshold,
     Settings,
     Log)
+
+class DynamicPagination(PageNumberPagination):
+    page_size = 30
+    page_size_query_param = 'page_size'
+    max_page_size = 1440
 
 # Create your views here.
 
@@ -151,6 +157,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
     queryset = PVData.objects.all()
     serializer_class = PVDataSerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='status', detail=False)
     def pv_system_status(self, request):
@@ -210,6 +217,11 @@ class PVDataViewSet(viewsets.ModelViewSet):
         time_begin, time_end = get_time_range(request)
 
         pv_data = PVData.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        page = self.paginate_queryset(pv_data)
+
+        if page is not None:
+            serializer = PVDataSerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
 
         return Response(PVDataSerializer(pv_data, many=True).data)
 
@@ -217,20 +229,27 @@ class PVStringViewSet(viewsets.ModelViewSet):
 
     queryset = PVString.objects.all()
     serializer_class = PVStringSerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='history', detail=False)
     def pv_string_history(self, request):
         number = get_string_number(request)
         time_begin, time_end = get_time_range(request)
 
-        pv_data = PVString.objects.filter(string_number=number, timestamp__gte=time_begin, timestamp__lte=time_end)
+        string_data = PVString.objects.filter(string_number=number, timestamp__gte=time_begin, timestamp__lte=time_end)
+        page = self.paginate_queryset(string_data)
 
-        return Response(PVStringSerializer(pv_data, many=True).data)
+        if page is not None:
+            serializer = PVStringSerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
+
+        return Response(PVStringSerializer(string_data, many=True).data)
 
 class PowerForecastViewSet(viewsets.ModelViewSet):
 
     queryset = PowerForecast.objects.all()
     serializer_class = PowerForecastSerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='forecastday', detail=False)
     def forecast_day(self, request):
@@ -251,6 +270,11 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
         time_begin, time_end = get_time_range(request)
 
         forecast_data = PowerForecast.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        page = self.paginate_queryset(forecast_data)
+
+        if page is not None:
+            serializer = PowerForecastSerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
 
         return Response(PowerForecastSerializer(forecast_data, many=True).data)
 
@@ -258,6 +282,7 @@ class YieldDayViewSet(viewsets.ModelViewSet):
 
     queryset = YieldDay.objects.all()
     serializer_class = YieldDaySerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='now', detail=False)
     def yield_now(self, request):
@@ -279,6 +304,11 @@ class YieldDayViewSet(viewsets.ModelViewSet):
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldDay.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        page = self.paginate_queryset(yield_data)
+
+        if page is not None:
+            serializer = YieldDaySerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
 
         return Response(YieldDaySerializer(yield_data, many=True).data)
 
@@ -286,6 +316,7 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
 
     queryset = YieldMonth.objects.all()
     serializer_class = YieldMonthSerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='latest12', detail=False)
     def yield_latest_12(self, request):
@@ -302,6 +333,11 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldMonth.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        page = self.paginate_queryset(yield_data)
+
+        if page is not None:
+            serializer = YieldMonthSerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
 
         return Response(YieldMonthSerializer(yield_data, many=True).data)
 
@@ -309,6 +345,7 @@ class YieldYearViewSet(viewsets.ModelViewSet):
 
     queryset = YieldYear.objects.all()
     serializer_class = YieldYearSerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='latest10', detail=False)
     def yield_latest_10(self, request):
@@ -325,6 +362,11 @@ class YieldYearViewSet(viewsets.ModelViewSet):
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldYear.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        page = self.paginate_queryset(yield_data)
+
+        if page is not None:
+            serializer = YieldYearSerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
 
         return Response(YieldYearSerializer(yield_data, many=True).data)
 
@@ -332,6 +374,7 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
 
     queryset = YieldMinute.objects.all()
     serializer_class = YieldMinuteSerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='today', detail=False)
     def yield_today(self, request):
@@ -347,6 +390,11 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldMinute.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        page = self.paginate_queryset(yield_data)
+
+        if page is not None:
+            serializer = YieldMinuteSerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
 
         return Response(YieldMinuteSerializer(yield_data, many=True).data)
 
@@ -354,6 +402,7 @@ class AlertTresholdViewSet(viewsets.ModelViewSet):
 
     queryset = AlertTreshold.objects.all()
     serializer_class = AlertTresholdSerializer
+    pagination_class = DynamicPagination
 
 class SettingsViewSet(viewsets.ModelViewSet):
     
@@ -424,14 +473,20 @@ class LogViewSet(viewsets.ModelViewSet):
 
     queryset = Log.objects.all()
     serializer_class = LogSerializer
+    pagination_class = DynamicPagination
 
     @action(methods=['GET'], url_path='history', detail=False)
     def log_history(self, request):
         time_begin, time_end = get_time_range(request)
 
-        yield_data = Log.objects.filter(created_at__gte=time_begin, created_at__lte=time_end)
+        log_data = Log.objects.filter(created_at__gte=time_begin, created_at__lte=time_end)
+        page = self.paginate_queryset(log_data)
 
-        return Response(YieldMinuteSerializer(yield_data, many=True).data)
+        if page is not None:
+            serializer = LogSerializer(page, many=True).data
+            return Response(self.get_paginated_response(serializer).data)
+
+        return Response(LogSerializer(log_data, many=True).data)
 
 class ExternalAPIViweSet(viewsets.ViewSet):
 
