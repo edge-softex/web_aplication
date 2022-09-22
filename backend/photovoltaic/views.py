@@ -496,7 +496,7 @@ class ExternalAPIViweSet(viewsets.ViewSet):
 
         try:
             request_data['timestamp']
-            request_data['irradiation']
+            request_data['irradiance']
             request_data['temperature_pv']
             request_data['temperature_amb']
             request_data['power_avr']

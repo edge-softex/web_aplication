@@ -48,7 +48,7 @@ def simulate_input(self):
                                 string_number=2)
 
     data = PVData.objects.create(timestamp=datetime_now,
-                                irradiation=df_row['Radiacao_Avg'],
+                                irradiance=df_row['Radiacao_Avg'],
                                 temperature_pv=df_row['Temp_Cel_Avg'],
                                 temperature_amb=df_row['Temp_Amb_Avg'],
                                 power_avg=df_row['Potencia_FV_Avg'])
@@ -104,7 +104,7 @@ def calculate_alerts_tresholds(self):
     month_before = yesterday - timedelta(days=30)
     datetime_gte = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', stringify_datetime(month_before))
 
-    pv_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte, irradiation__gte=120)
+    pv_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte, irradiance__gte=120)
     length = len(pv_data)
 
     st, created = Settings.objects.get_or_create(id=1)
@@ -117,11 +117,11 @@ def calculate_alerts_tresholds(self):
         json_data = PVDataSerializer(pv_data[0]).data
         number_strings = len(json_data['strings'])
 
-        data_ordered_irrad = pv_data.order_by('irradiation')
+        data_ordered_irrad = pv_data.order_by('irradiance')
         data_ordered_temp = pv_data.order_by('temperature_pv')
 
-        min_irrad = round(data_ordered_irrad[0].irradiation)
-        max_irrad = round(data_ordered_irrad[length-1].irradiation)
+        min_irrad = round(data_ordered_irrad[0].irradiance)
+        max_irrad = round(data_ordered_irrad[length-1].irradiance)
         min_temp = round(data_ordered_temp[0].temperature_pv)
         max_temp = round(data_ordered_temp[length-1].temperature_pv)
 
@@ -134,7 +134,7 @@ def calculate_alerts_tresholds(self):
         delt_cr = st.delt_cr
 
         for value in range(min_irrad, max_irrad+1):
-            data_filtered = pv_data.filter(irradiation__gte = value - delt_cr, irradiation__lte = value + delt_cr)
+            data_filtered = pv_data.filter(irradiance__gte = value - delt_cr, irradiance__lte = value + delt_cr)
 
             current_data = np.zeros((number_strings, data_filtered.count()))
 
@@ -193,10 +193,10 @@ def set_data(self, request_data):
     else:
         temperature = 0
 
-    if request_data['irradiation'] is not None:
-        irradiation = request_data['irradiation']
+    if request_data['irradiance'] is not None:
+        irradiance = request_data['irradiance']
     else:
-        irradiation = 0 
+        irradiance = 0 
 
     for string in request_data['strings']:
         if string['power'] is None and string['voltage'] is not None and string['current'] is not None:
@@ -209,12 +209,12 @@ def set_data(self, request_data):
                                 current=string['current'],
                                 power=string_power,
                                 voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
-                                current_alert=alert_definition('CR', string['string_number'], irradiation, string['current']),
+                                current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
                                 string_number=string['string_number'])
         strings_ref.append(string_obj)
 
     data = PVData.objects.create(timestamp=data_timestamp,
-                                irradiation=request_data['irradiation'],
+                                irradiance=request_data['irradiance'],
                                 temperature_pv=request_data['temperature_pv'],
                                 temperature_amb=request_data['temperature_amb'])
 
@@ -266,7 +266,7 @@ def instant_power_forecast(self, timestamp):
     datetime_gte = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f%z')
     datetime_gte = datetime_gte - timedelta(minutes=120)
     data = PVData.objects.filter(timestamp__gte=stringify_datetime(datetime_gte), timestamp__lte=timestamp)
-    iradiation = data.values_list('irradiation', flat=True)
+    iradiation = data.values_list('irradiance', flat=True)
     temperature_pv = data.values_list('temperature_pv', flat=True)
     power_avr = data.values_list('power_avg', flat=True)
 
