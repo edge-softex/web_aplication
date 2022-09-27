@@ -1,9 +1,13 @@
 import React from 'react';
 
+import './App.css';
+
+import Dashboard from './containers/Dashboard/Dashboard';
+
 function App() {
   return (
-    <div>
-      <p>App</p>
+    <div className="App">
+      <Dashboard />
     </div>
   );
 }

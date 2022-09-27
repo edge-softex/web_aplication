@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import '../../containers/Dashboard/Dashboard.css';
+
 function Title(props) {
   const { children } = props;
 
-  return <p>{children}</p>;
+  return <h1 className="title_h1">{children}</h1>;
 }
 
 Title.propTypes = {
