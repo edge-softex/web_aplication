@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import '../../containers/Dashboard/Dashboard.css';
+import './Title.css';
 
 function Title(props) {
   const { children } = props;

@@ -1,8 +1,9 @@
-.title_h1 {
-    display:inline;
-    color: #173C6C;
-    font-size: 1.5rem;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 1.6rem;
+.dashboard-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #F5F9FF;
 }
