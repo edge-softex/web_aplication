@@ -61,15 +61,39 @@ class DynamicPagination(PageNumberPagination):
 # Create your views here.
 
 class UserViewSet(viewsets.ModelViewSet):
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     @action(methods=['GET'], url_path='profile', detail=False)
     def profile(self, request):
+        """Returns the data of the logged user.
+        
+        :rtype: Response
+        :return: User (username, email, first_name, last_name)
+        """
+
         return Response(UserSerializer(request.user).data)
 
     @action(methods=['POST'], url_path='createuser', detail=False)
     def create_user(self, request):
+        """Create a new user on the database.
+
+        username: unique text that will be used by the user to login
+        type username: str
+        first_name: user's first name
+        type first_name: str
+        last_name: user's last name
+        type last_name: str
+        email: user's email
+        type email: str
+        password: secret text used by the user to login
+        type password: str
+        
+        :rtype: Response
+        :return: status
+        """
+
         request_data = request.data
 
         try:
@@ -91,6 +115,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['DELETE'], url_path='deactivateuser', detail=False)
     def deactivate_user(self, request):
+        """Deactivate the user in the database.
+
+        username: unique text that will be used by the user to login
+        type username: str
+        
+        :rtype: Response
+        :return: status
+        """
+
         request_data = request.data
 
         try:
@@ -104,6 +137,23 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST'], url_path='edituser', detail=False)
     def edit_user(self, request):
+        """Change the data of a user that already exists in the database. To not change a data, just provide None.
+
+        username: unique text that will be used by the user to login
+        type username: str
+        first_name: user's first name
+        type first_name: str
+        last_name: user's last name
+        type last_name: str
+        email: user's email
+        type email: str
+        password: secret text used by the user to login
+        type password: str
+        
+        :rtype: Response
+        :return: status
+        """
+
         request_data = request.data
 
         try:
@@ -127,10 +177,22 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=200)
 
 class AccountsViewSet(viewsets.ViewSet):
+
     permission_classes = [permissions.AllowAny]
 
     @action(methods=['POST'], url_path='login', detail=False)
     def login_(self, request):
+        """Perform user login.
+
+        username: unique text that will be used by the user to login
+        type username: str
+        password: secret text used by the user to login
+        type password: str
+        
+        :rtype: Response
+        :return: status
+        """
+
         serializer = LoginSerializer(data=request.data, context={ 'request': request })
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
@@ -139,11 +201,28 @@ class AccountsViewSet(viewsets.ViewSet):
 
     @action(methods=['POST'], url_path='logout', detail=False)
     def logout_(self, request):
+        """Perform user logout.
+        
+        :rtype: Response
+        :return: status
+        """
+
         logout(request)
         return Response(status=202)
 
     @action(methods=['GET'], url_path='token', detail=False)
     def get_token(self, request):
+        """Returns the user token and system timezone. Used by the Solaire library.
+
+        username: unique text that will be used by the user to login
+        type username: str
+        password: secret text used by the user to login
+        type password: str
+        
+        :rtype: Response
+        :return: token, timezone
+        """
+
         serializer = LoginSerializer(data=request.data, context={ 'request': request })
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
@@ -161,6 +240,12 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='status', detail=False)
     def pv_system_status(self, request):
+        """Returns the PV system status.
+        
+        :rtype: Response
+        :return: status (system status)
+        """
+
         latest_data = PVDataSerializer(PVData.objects.latest('timestamp')).data
 
         time_now = timestamp_aware()
@@ -187,11 +272,22 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='latest', detail=False)
     def pv_data_latest(self, request):
+        """Returns the last received PV system dataset.
+        
+        :rtype: Response
+        :return: PVData (timestamp, irradiance, temperature_pv, temperature_amb, power_avg, strings)
+        """
+
         latest_data = PVData.objects.latest('timestamp')
         return Response(PVDataSerializer(latest_data).data)
 
     @action(methods=['GET'], url_path='meteorologicalday', detail=False)
     def meteorological_day(self, request):
+        """Returns meteorological data for the last 24 hours (max 1440 datasets).
+        
+        :rtype: Response
+        :return: list of PVData (timestamp, irradiance, temperature_pv, temperature_amb)
+        """
         now = timestamp_aware()
         datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(days=1)
@@ -202,6 +298,12 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='powerday', detail=False)
     def power_day(self, request):
+        """Returns the power data of the last 24 hours (max 1440 datasets).
+        
+        :rtype: Response
+        :return: list of PVData (timestamp, power_avr)
+        """
+
         time_interval = get_time_inteval(request)
 
         now = timestamp_aware()
@@ -214,6 +316,19 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def pv_data_history(self, request):
+        """Returns the PVData set between the given timestamps. By default it returns data for the last 24 hours.
+
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of PVData (timestamp, irradiance, temperature_pv, temperature_amb, power_avg, strings)
+        """
+
         time_begin, time_end = get_time_range(request)
 
         pv_data = PVData.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
@@ -233,6 +348,21 @@ class PVStringViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def pv_string_history(self, request):
+        """Returns the PVString set between the given timestamps. By default it returns data for the last 24 hours.
+
+        string_number: number that identifies the queried string, default is 1
+        type string_number: int
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of PVString (name, timestamp, voltage, current, power, volatge_alert, current_alert, string_number)
+        """
+
         number = get_string_number(request)
         time_begin, time_end = get_time_range(request)
 
@@ -253,6 +383,15 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='forecastday', detail=False)
     def forecast_day(self, request):
+        """Returns the power forecast data of the last x minutes (max 1445 datasets).
+
+        time_interval: time interval in minutes that the data will be filtered, default is 10
+        type time_interval: int
+        
+        :rtype: Response
+        :return: list of PowerForecast (timestamp, t1, t2, t3, t4, t5)
+        """
+
         time_interval = get_time_inteval(request)
 
         now = timestamp_aware()
@@ -267,6 +406,19 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def power_forecast_history(self, request):
+        """Returns the PowerForecast set between the given timestamps. By default it returns data for the last 24 hours.
+
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of PowerForecast (timestamp, t1, t2, t3, t4, t5)
+        """
+
         time_begin, time_end = get_time_range(request)
 
         forecast_data = PowerForecast.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
@@ -286,11 +438,23 @@ class YieldDayViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='now', detail=False)
     def yield_now(self, request):
+        """Returns the last yield data.
+        
+        :rtype: Response
+        :return: YieldDay (timestamp, yield_day, yield_day_forecast)
+        """
+
         yield_today = YieldDay.objects.latest('timestamp')
         return Response(YieldDaySerializer(yield_today).data)
 
     @action(methods=['GET'], url_path='latest15', detail=False)
     def yield_latest_15(self, request):
+        """Returns the yield day data of the last 15 days.
+        
+        :rtype: Response
+        :return: list of YieldDay (timestamp, yield_day, yield_day_forecast)
+        """
+
         now = timestamp_aware()
         datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(days=15)
@@ -301,6 +465,19 @@ class YieldDayViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def yield_day_history(self, request):
+        """Returns the YieldDay set between the given timestamps. By default it returns data for the last 24 hours.
+
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of YieldDay (timestamp, yield_day, yield_day_forecast)
+        """
+
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldDay.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
@@ -320,6 +497,12 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='latest12', detail=False)
     def yield_latest_12(self, request):
+        """Returns the yield month data of the last 12 months.
+        
+        :rtype: Response
+        :return: list of YieldMonth (timestamp, yield_month, yield_month_forecast)
+        """
+
         now = timestamp_aware()
         datetime_lte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
         yesterday = now - relativedelta(months=12)
@@ -330,6 +513,19 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def yield_month_history(self, request):
+        """Returns the YieldMonth set between the given timestamps. By default it returns data for the last 24 hours.
+
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of YieldMonth (timestamp, yield_month, yield_month_forecast)
+        """
+
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldMonth.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
@@ -349,6 +545,12 @@ class YieldYearViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='latest10', detail=False)
     def yield_latest_10(self, request):
+        """Returns the yield year data of the last 10 years.
+        
+        :rtype: Response
+        :return: list of YieldYear (timestamp, yield_year, yield_year_forecast)
+        """
+
         now = timestamp_aware()
         datetime_lte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
         yesterday = now - relativedelta(months=120)
@@ -359,6 +561,19 @@ class YieldYearViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def yield_year_history(self, request):
+        """Returns the YieldYear set between the given timestamps. By default it returns data for the last 24 hours.
+
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of YieldYear (timestamp, yield_year, yield_year_forecast)
+        """
+
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldYear.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
@@ -378,6 +593,12 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='today', detail=False)
     def yield_today(self, request):
+        """Returns the yield minute data of the actual day (max 1440 datasets).
+        
+        :rtype: Response
+        :return: list of YieldMinute (timestamp, yield_minute, yield_day_forecast)
+        """
+
         now = timestamp_aware()
         datetime_lte = stringify_datetime(now)
         datetime_gte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
@@ -387,6 +608,19 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def yield_minute_history(self, request):
+        """Returns the YieldMinute set between the given timestamps. By default it returns data for the last 24 hours.
+
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of YieldMinute (timestamp, yield_minute, yield_day_forecast)
+        """
+
         time_begin, time_end = get_time_range(request)
 
         yield_data = YieldMinute.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
@@ -411,6 +645,24 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST'], url_path='setalertsettings', detail=False)
     def set_alert_settings(self, request):
+        """Change the alert settings. To not change a data, just provide None.
+
+        fault_vt_percentile: percentile of the threshold calculation for the voltage failure alert
+        type fault_vt_percentile: int, 1 to 99
+        warning_vt_percentile: percentile of the threshold calculation for the voltage failure alert
+        type warning_vt_percentile: int, 1 to 99
+        delt_vt: neighborhood of values used in the calculation of voltage thresholds
+        type delt_vt: int, greater than 0
+        fault_cr_percentile: percentile of the threshold calculation for the current failure alert
+        type fault_cr_percentile: int, 1 to 99
+        warning_cr_percentile: percentile of the threshold calculation for the current failure alert
+        type warning_cr_percentile: int, 1 to 99
+        delt_cr: neighborhood of values used in the calculation of current thresholds
+        type delt_cr: int, greater than 0
+        
+        :rtype: Response
+        :return: status
+        """
 
         st, created = Settings.objects.get_or_create(id=1)
 
@@ -433,6 +685,16 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST'], url_path='setalertactive', detail=False)
     def set_alert_active(self, request):
+        """Change whether alerts are active or not. To not change a data, just provide None.
+
+        fault_user_active: set whether fault alerts are active or not
+        type fault_user_active: boolean
+        warning_user_active: set whether warning alerts are active or not
+        type warning_user_active: boolean
+        
+        :rtype: Response
+        :return: status
+        """
 
         st, created = Settings.objects.get_or_create(id=1)
 
@@ -449,6 +711,14 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST'], url_path='setretraininginterval', detail=False)
     def set_retraining_interval(self, request):
+        """Change the interval between model retraining.
+
+        retraining_interval: time interval between model training in months, default is 3
+        type retraining_interval: int
+        
+        :rtype: Response
+        :return: status
+        """
 
         st, created = Settings.objects.get_or_create(id=1)
 
@@ -464,6 +734,11 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='daysleft', detail=False)
     def days_left_alert(self, request):
+        """Returns the days left to accumulate enough data to activate alerts.
+        
+        :rtype: Response
+        :return: days_left
+        """
 
         st, created = Settings.objects.get_or_create(id=1)
 
@@ -477,6 +752,19 @@ class LogViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='history', detail=False)
     def log_history(self, request):
+        """Returns the log set between the given timestamps. By default it returns data for the last 24 hours.
+
+        time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        time_end: final datetime to filter the data, default is the current datetime
+        type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        page: number of the page in which the data is separated, default is 1
+        type page: int
+        
+        :rtype: Paginated Response
+        :return: list of Log (message, title, created_at)
+        """
+
         time_begin, time_end = get_time_range(request)
 
         log_data = Log.objects.filter(created_at__gte=time_begin, created_at__lte=time_end)
@@ -492,6 +780,12 @@ class ExternalAPIViweSet(viewsets.ViewSet):
 
     @action(methods=['POST'], url_path='postdata', detail=False)
     def post_data(self, request):
+        """Receives data from the Solaire library for insertion into the system.
+        
+        :rtype: Response
+        :return: status
+        """
+
         request_data = request.data
 
         try:
