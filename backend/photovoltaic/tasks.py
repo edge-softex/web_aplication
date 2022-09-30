@@ -19,6 +19,8 @@ def createLog(self, exc, task_id, args, kwargs, einfo):
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def simulate_input(self):
+    """Simulates data entry to perform system tests."""
+    
     df = read_dat_file('./photovoltaic/fixtures/test_day.dat')
 
     tz = timezone(settings.TIME_ZONE)
@@ -88,6 +90,21 @@ def simulate_input(self):
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
+    """Simulates instantaneous power forecast to perform system tests.
+
+    param datetime_now: timestamp of generated data
+    type username: datetime
+    param power_1: power of the next data set
+    type power_1: float
+    param power_2: power of the second data set ahead
+    type power_2: float
+    param power_3: power of the third data set ahead
+    type power_3: float
+    param power_4: power of the fourth data set ahead
+    type power_4: float
+    param power_5: power of the fifth data set ahead
+    type power_5: float
+    """
     pf = PowerForecast.objects.create(timestamp=datetime_now,
                                     t1=power1 + random.uniform(0, 1.0),
                                     t2=power2 + random.uniform(0.3, 1.3),
@@ -98,6 +115,8 @@ def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def calculate_alerts_tresholds(self):
+    """Calculates the thresholds used to activate alerts."""
+
     now = timestamp_aware()
     yesterday = now - timedelta(days=1)
     datetime_lte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(yesterday))
@@ -181,6 +200,11 @@ def calculate_alerts_tresholds(self):
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def set_data(self, request_data):
+    """ Function that receives data from external sources, processes it and saves it in the database.
+
+    param request_data: dataset for insertion into the system
+    tupe request_data: json
+    """
 
     strings_ref = []
 
