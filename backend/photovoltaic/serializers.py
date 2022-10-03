@@ -14,8 +14,7 @@ from .models import (
     YieldMinute,
     AlertTreshold,
     Settings,
-    Log,
-    AIAlgorithm
+    Log
 )
 
 class UserSerializer(serializers.ModelSerializer):
@@ -125,12 +124,3 @@ class LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Log
         fields = '__all__'
-
-class AIAlgorithmSerializer(serializers.ModelSerializer):
-
-    current_status = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = AIAlgorithm
-        read_only_fields = ("id", "name", "description","created_at")
-        fields = read_only_fields
