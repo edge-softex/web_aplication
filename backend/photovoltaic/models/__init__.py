@@ -8,3 +8,4 @@ from .yieldminute import YieldMinute
 from .alert_treshold import AlertTreshold
 from .settings import Settings
 from .log import Log
+from .aialgorithm import AIAlgorithm
