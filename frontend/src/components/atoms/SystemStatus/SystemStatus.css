@@ -1,0 +1,65 @@
+.systemstatus_div-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 105px;
+    height: 48px;
+    border-radius: 10px;
+    background-color: #F5F9FF;
+    padding: 5px;
+}
+
+.systemstatus_div-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 60%;
+}
+
+.systemstatus_div-ball {
+    width: 6px;
+    height: 6px;
+    border-radius: 100%;
+}
+
+.normaloperation {
+    background-color: #5dff57;
+}
+
+.offline {
+    background-color: #85898C;
+}
+
+.warning {
+    background-color: #fffc57;
+}
+
+.fault {
+    background-color: #FF5757;
+}
+
+.systemstatus_h3 {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #2C3B48;
+    font-style: normal;
+}
+
+.systemstatus_div-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 40%;
+}
+
+.systemstatus_p-title {
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: #85898C;
+    font-style: normal;
+}

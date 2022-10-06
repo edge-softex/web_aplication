@@ -1,25 +1,21 @@
 import React from 'react';
 
+import SystemStatus from '../../atoms/SystemStatus/SystemStatus';
+import UserAvatar from '../../atoms/userAvatar/UserAvatar';
+
 import './NavigationItems.css';
 
-const navigationItems = (props) => {
-  let navItems = (
+function NavigationItems() {
+  return (
     <ul className="nav_list">
       <li>
-        <p>
-          Home
-        </p>
+        <SystemStatus status="fault" />
       </li>
       <li>
-        <p>Fault</p>
-      </li>
-      <li>
-        <p>Vinicius Feitosa</p>
+        <UserAvatar name="Vinicius Feitosa" />
       </li>
     </ul>
   );
+}
 
-  return navItems;
-};
-
-export default navigationItems;
+export default NavigationItems;

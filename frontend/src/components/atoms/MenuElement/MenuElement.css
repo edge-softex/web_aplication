@@ -1,0 +1,28 @@
+.menu-element_div-container {
+    width: 100%;
+    height: 76px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: #4D5962;
+}
+
+.menu-element_div-container.active {
+    border-left: 5px solid #173C6C;
+    border-radius: 5px 0 0 5px;
+
+    width: 100%;
+    height: 76px;
+
+    color: #173C6C;
+    background: #DFEDFF;
+}
+
+.menu-element_div-container p {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 14px;
+}
