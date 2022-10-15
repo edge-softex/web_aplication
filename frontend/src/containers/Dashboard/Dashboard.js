@@ -2,6 +2,7 @@ import React from 'react';
 
 import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/NavigationItems/Card/Card';
+import LineChart from '../../components/atoms/LineChart/LineChart';
 
 import './Dashboard.css';
 
@@ -11,9 +12,43 @@ function Dashboard() {
       <div className="title_div-container">
         <Title>Dashboard</Title>
       </div>
-      <Card>
-        <h1>Teste</h1>
-      </Card>
+      <div className="cards_div-container">
+        <Card
+          width={470}
+          height={439}
+          title="Yield Today"
+        >
+          <LineChart />
+        </Card>
+        <Card
+          width={470}
+          height={439}
+          title="Yield Today"
+        >
+          <LineChart />
+        </Card>
+        <Card
+          width={470}
+          height={439}
+          title="Yield Today"
+        >
+          <LineChart />
+        </Card>
+        <Card
+          width={470}
+          height={439}
+          title="Yield Today"
+        >
+          <LineChart />
+        </Card>
+        <Card
+          width={470}
+          height={439}
+          title="Yield Today"
+        >
+          <LineChart />
+        </Card>
+      </div>
     </div>
   );
 }

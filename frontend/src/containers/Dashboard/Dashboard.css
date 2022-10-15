@@ -6,7 +6,7 @@
     width: 100%;
     height: auto;
     background-color: #F5F9FF;
-    padding: 0 2%;
+    padding: 0 2% 30px 2%;
 }
 
 .title_div-container {
@@ -15,4 +15,14 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+}
+
+.cards_div-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: auto;
 }

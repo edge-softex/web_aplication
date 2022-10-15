@@ -15,6 +15,7 @@ function Menu() {
   return (
     <div className="menu_div-container">
       <MenuElement
+        exact
         link="/dashboard"
         title="Dashboard"
       >

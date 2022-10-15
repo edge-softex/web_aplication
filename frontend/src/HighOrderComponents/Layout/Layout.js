@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Navigation from '../../components/Organism/Navigation/Navigation';
-import Footer from '../../components/Organism/Footer/Footer';
 import Menu from '../../components/Organism/Menu/Menu';
 
 import './Layout.css';
@@ -17,7 +16,6 @@ function Layout(props) {
         <Menu />
         {children}
       </div>
-      <Footer />
     </div>
   );
 }
