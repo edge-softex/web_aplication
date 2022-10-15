@@ -3,6 +3,7 @@ import React from 'react';
 import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/NavigationItems/Card/Card';
 import LineChart from '../../components/atoms/LineChart/LineChart';
+import BarChart from '../../components/atoms/BarChart/BarChart';
 
 import './Dashboard.css';
 
@@ -14,35 +15,40 @@ function Dashboard() {
       </div>
       <div className="cards_div-container">
         <Card
-          width={470}
+          minWidth={400}
+          width="35%"
           height={439}
           title="Yield Today"
         >
           <LineChart />
         </Card>
         <Card
-          width={470}
+          minWidth={604}
+          width="57%"
+          height={439}
+          title="Yield Today"
+        >
+          <BarChart />
+        </Card>
+        <Card
+          minWidth={604}
+          width="57%"
           height={439}
           title="Yield Today"
         >
           <LineChart />
         </Card>
         <Card
-          width={470}
+          minWidth={400}
+          width="35%"
           height={439}
           title="Yield Today"
         >
           <LineChart />
         </Card>
         <Card
-          width={470}
-          height={439}
-          title="Yield Today"
-        >
-          <LineChart />
-        </Card>
-        <Card
-          width={470}
+          minWidth={400}
+          width="35%"
           height={439}
           title="Yield Today"
         >

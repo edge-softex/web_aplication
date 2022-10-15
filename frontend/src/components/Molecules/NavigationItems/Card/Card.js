@@ -9,13 +9,23 @@ import './Card.css';
 function Card(props) {
   const {
     children,
+    minWidth,
+    maxWidth,
     width,
     height,
     title,
   } = props;
 
   return (
-    <div className="card_div-container" style={{ width, height }}>
+    <div
+      className="card_div-container"
+      style={{
+        minWidth,
+        maxWidth,
+        width,
+        height,
+      }}
+    >
       <div className="card_div-head">
         <div className="card_div-title">
           <CardTitle>{title}</CardTitle>
@@ -37,6 +47,8 @@ Card.propTypes = {
     PropTypes.string,
     PropTypes.object,
   ]).isRequired,
+  minWidth: PropTypes.number.isRequired,
+  maxWidth: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
