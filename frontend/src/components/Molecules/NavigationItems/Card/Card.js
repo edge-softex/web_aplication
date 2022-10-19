@@ -10,7 +10,6 @@ function Card(props) {
   const {
     children,
     minWidth,
-    maxWidth,
     width,
     height,
     title,
@@ -21,7 +20,6 @@ function Card(props) {
       className="card_div-container"
       style={{
         minWidth,
-        maxWidth,
         width,
         height,
       }}
@@ -48,8 +46,10 @@ Card.propTypes = {
     PropTypes.object,
   ]).isRequired,
   minWidth: PropTypes.number.isRequired,
-  maxWidth: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
+  width: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+  ]).isRequired,
   height: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
 };

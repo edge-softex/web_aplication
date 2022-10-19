@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { getPowerData } from '../../store/actions/powerDataAction';
 
 import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/NavigationItems/Card/Card';
@@ -9,6 +12,15 @@ import HalfDoughnutChart from '../../components/atoms/halfDoughnutChart/HalfDoug
 import './Dashboard.css';
 
 function Dashboard() {
+  const powerData = useSelector((state) => state.power.powerData);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getPowerData());
+  }, []);
+
+  console.log(powerData);
+
   return (
     <div className="dashboard-div">
       <div className="title_div-container">
