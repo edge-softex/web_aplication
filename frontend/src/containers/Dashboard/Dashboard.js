@@ -4,6 +4,7 @@ import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/NavigationItems/Card/Card';
 import LineChart from '../../components/atoms/LineChart/LineChart';
 import BarChart from '../../components/atoms/BarChart/BarChart';
+import HalfDoughnutChart from '../../components/atoms/halfDoughnutChart/HalfDoughnutChart';
 
 import './Dashboard.css';
 
@@ -53,6 +54,22 @@ function Dashboard() {
           title="Yield Today"
         >
           <LineChart />
+        </Card>
+        <Card
+          minWidth={400}
+          width="35%"
+          height={439}
+          title="Yield Today"
+        >
+          <HalfDoughnutChart />
+        </Card>
+        <Card
+          minWidth={400}
+          width="35%"
+          height={439}
+          title="Yield Today"
+        >
+          <HalfDoughnutChart />
         </Card>
       </div>
     </div>
