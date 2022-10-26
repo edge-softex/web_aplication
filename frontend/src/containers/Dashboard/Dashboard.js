@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getPowerData } from '../../store/actions/powerDataAction';
 
 import Title from '../../components/atoms/Title/Title';
-import Card from '../../components/Molecules/NavigationItems/Card/Card';
+import Card from '../../components/Molecules/Card/Card';
 import LineChart from '../../components/atoms/LineChart/LineChart';
 import BarChart from '../../components/atoms/BarChart/BarChart';
 import HalfDoughnutChart from '../../components/atoms/halfDoughnutChart/HalfDoughnutChart';

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import CardTitle from '../../../atoms/CardTitle/CardTitle';
-import Consumption from '../../../atoms/Consumption/Consumption';
+import CardTitle from '../../atoms/CardTitle/CardTitle';
+import Consumption from '../../atoms/Consumption/Consumption';
 
 import './Card.css';
 
