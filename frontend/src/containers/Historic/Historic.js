@@ -3,6 +3,7 @@ import React from 'react';
 import Title from '../../components/atoms/Title/Title';
 import SearchCard from '../../components/Molecules/SearchCard/SearchCard';
 import DropDown from '../../components/atoms/DropDown/DropDown';
+import FooterHistoric from '../../components/Organism/FooterHistoric/FooterHistoric';
 
 import './Historic.css';
 
@@ -17,12 +18,14 @@ function Historic() {
           options={[
             { value: 'teste1', name: 'nome1' },
             { value: 'teste2', name: 'nome2' },
+            { value: 'teste3', name: 'nome3' },
           ]}
           width="35%"
           title="Escolher Tabela"
         />
       </div>
       <SearchCard />
+      <FooterHistoric />
     </div>
   );
 }
