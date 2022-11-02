@@ -1,9 +1,13 @@
 import React from 'react';
 
+import LisOfSmallButtonsFooter from '../../Molecules/ListOfSmallButtonsFooter/LisOfSmallButtonsFooter';
+
+import './FooterHistoric.css';
+
 function FooterHistoric() {
   return (
-    <div>
-      <h1>Footer</h1>
+    <div className="FooterHistoric_div-container">
+      <LisOfSmallButtonsFooter list={[1, 2, 3, 4, 5]} />
     </div>
   );
 }
