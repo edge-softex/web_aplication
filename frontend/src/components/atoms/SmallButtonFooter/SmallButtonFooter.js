@@ -8,9 +8,7 @@ function SmallButtonFooter(props) {
 
   return (
     <button className="SmallButtonFooter_button-contanier" type="button">
-      <p className="SmallButtonFooter_p-content">
-        {children}
-      </p>
+      {children}
     </button>
   );
 }

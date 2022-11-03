@@ -21,6 +21,7 @@ function Historic() {
             { value: 'teste3', name: 'nome3' },
           ]}
           width="35%"
+          height={48}
           title="Escolher Tabela"
         />
       </div>

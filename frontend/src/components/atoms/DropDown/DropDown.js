@@ -5,7 +5,7 @@ import './DropDown.css';
 
 function DropDown(props) {
   const {
-    options, width, title,
+    options, width, title, height,
   } = props;
 
   return (
@@ -15,6 +15,9 @@ function DropDown(props) {
     >
       <h3 className="h3_dropdown-title">{title}</h3>
       <select
+        style={{
+          height,
+        }}
         className="select_dropdown"
       >
         {options.map((option) => (
@@ -36,6 +39,10 @@ DropDown.propTypes = {
     name: PropTypes.string.isRequired,
   })).isRequired,
   width: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+  ]).isRequired,
+  height: PropTypes.oneOfType([
     PropTypes.number,
     PropTypes.string,
   ]).isRequired,
