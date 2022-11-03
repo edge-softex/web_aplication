@@ -23,6 +23,7 @@
     width: 6px;
     height: 6px;
     border-radius: 100%;
+    animation: blowingBall 1s infinite linear;
 }
 
 .normaloperation {
@@ -62,4 +63,13 @@
     font-size: 0.75rem;
     color: #85898C;
     font-style: normal;
+}
+
+@keyframes blowingBall {
+    0% {
+        transform: scale(1)
+      }
+      100% {
+        transform: scale(2)
+      }
 }

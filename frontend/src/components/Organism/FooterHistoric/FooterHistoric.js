@@ -19,6 +19,7 @@ function FooterHistoric() {
           height={40}
           title="Escolher Tabela"
         />
+        <p className="FooterHistoric_p-rightContent">de 150 registros</p>
       </div>
       <LisOfSmallButtonsFooter list={[1, 2, 3, 4, 5]} />
     </div>

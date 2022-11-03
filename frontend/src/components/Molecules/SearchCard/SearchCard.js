@@ -1,7 +1,10 @@
 import React from 'react';
 
 import Input from '../../atoms/Input/Input';
+import Button from '../../atoms/Button/Button';
 import './SearchCard.css';
+import { ReactComponent as CloudSVG } from '../../../assets/images/cloud.svg';
+import { ReactComponent as SearchSVG } from '../../../assets/images/search.svg';
 
 const elements = [
   {
@@ -22,10 +25,33 @@ function SearchCard() {
   return (
     <div className="searchcard_div-container">
       <div className="head_div">
-        <Input width="22%" />
+        <div className="head_div-left">
+          <SearchSVG
+            className="searchcard_svg-search"
+          />
+          <Input
+            width="100%"
+            type="search"
+            placeholder="Buscar..."
+          />
+        </div>
         <div className="head_div-right">
-          <Input title="Data e hora inicial" width="30%" />
-          <Input title="Data e hora final" width="30%" />
+          <Input
+            title="Data e hora inicial"
+            width="30%"
+            type="date"
+          />
+          <Input
+            title="Data e hora final"
+            width="30%"
+            type="date"
+          />
+          <Button>
+            {' '}
+            <CloudSVG />
+            {' '}
+            Download CSV
+          </Button>
         </div>
       </div>
       <div className="searchcard_div-body">
