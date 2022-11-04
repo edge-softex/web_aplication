@@ -130,4 +130,4 @@ class AIAlgorithmSerializer(serializers.ModelSerializer):
     class Meta:
         model = AIAlgorithm
         read_only_fields = ("id", "name", "description","created_at")
-        fields = ("id", "name", "description", "availability", "created_at")
+        fields = ("id", "name", "description", "availability", "update",  "created_at")

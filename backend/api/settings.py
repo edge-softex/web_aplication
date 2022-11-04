@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -134,8 +136,26 @@ CELERY_RESULT_EXPIRES = timedelta(days=60)
 
 task_default_queue = 'default'
 
-task_routes = {'photovoltaic.tasks.simulate_model': {'queue': 'run_models'},
-                'photovoltaic.tasks.set_data': {'queue': 'input_data'}}
+task_routes = {'photovoltaic.tasks.simulate_model': {'queue': 'input_data'},
+                'photovoltaic.tasks.simulate_input': {'queue': 'input_data'},
+                'photovoltaic.tasks.set_data': {'queue': 'input_data'},
+                'photovoltaic.tasks.instant_power_forecast': {'queue': 'run_models'},
+                'photovoltaic.tasks.model_updating': {'queue': 'run_models'},
+                'photovoltaic.tasks.model_retraining': {'queue': 'training_model'}}
+
+CELERY_BEAT_SCHEDULE = {
+    'ai_model_retraining': {
+        'task': 'photovoltaic.tasks.model_retraining',
+        'schedule': crontab(0, 0, month_of_year='*/3'),
+        'options': {'queue': 'training_model'}
+    },
+    'ai_model_inference': {
+        'task': 'photovoltaic.tasks.instant_power_forecast',
+        'schedule':timedelta(minutes=1),
+        'options': {'queue': 'run_models'}
+    }
+}
+
 
 
 # Static files (CSS, JavaScript, Images)

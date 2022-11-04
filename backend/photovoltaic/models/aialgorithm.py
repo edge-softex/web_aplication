@@ -8,6 +8,7 @@ class AIAlgorithm(models.Model):
         name: The name of the algorithm.
         description: The short description of how the algorithm works.
         availability: If the algorithm is available or not (True or False).
+        update: If there is a new version of the model available or not (True or False).
         created_at: The date when MLAlgorithm was created.
     '''
     name = models.CharField(max_length=128)
