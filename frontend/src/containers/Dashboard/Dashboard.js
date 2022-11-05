@@ -39,7 +39,7 @@ function Dashboard() {
           minWidth={604}
           width="57%"
           height={439}
-          title="Yield Today"
+          title="Yield History"
         >
           <BarChart />
         </Card>
@@ -47,9 +47,9 @@ function Dashboard() {
           minWidth={604}
           width="57%"
           height={439}
-          title="Yield Today"
+          title="Instant Power"
         >
-          <LineChart />
+          <LineChart powerData/>
         </Card>
         <Card
           minWidth={400}
