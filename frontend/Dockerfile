@@ -9,6 +9,7 @@ RUN npm install @material-ui/core
 RUN npm install @material-ui/icons
 RUN npm install bootstrap
 RUN npm install recharts
+RUN npm install axios
 
 COPY . ./
 

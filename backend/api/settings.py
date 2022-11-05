@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,8 +29,7 @@ SECRET_KEY = 'django-insecure-t@5ae5tw)z4&=*zgu5o^*&$vd#95(3vac$h%a0-l3p2he_j250
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'photovoltaic',
     'django_celery_beat',
     'django_celery_results',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -134,7 +136,26 @@ CELERY_RESULT_EXPIRES = timedelta(days=60)
 
 task_default_queue = 'default'
 
-task_routes = {'photovoltaic.tasks.simulate_model': {'queue': 'model'}}
+task_routes = {'photovoltaic.tasks.simulate_model': {'queue': 'input_data'},
+                'photovoltaic.tasks.simulate_input': {'queue': 'input_data'},
+                'photovoltaic.tasks.set_data': {'queue': 'input_data'},
+                'photovoltaic.tasks.instant_power_forecast': {'queue': 'run_models'},
+                'photovoltaic.tasks.model_updating': {'queue': 'run_models'},
+                'photovoltaic.tasks.model_retraining': {'queue': 'training_model'}}
+
+CELERY_BEAT_SCHEDULE = {
+    'ai_model_retraining': {
+        'task': 'photovoltaic.tasks.model_retraining',
+        'schedule': crontab(0, 0, month_of_year='*/3'),
+        'options': {'queue': 'training_model'}
+    },
+    'ai_model_inference': {
+        'task': 'photovoltaic.tasks.instant_power_forecast',
+        'schedule':timedelta(minutes=1),
+        'options': {'queue': 'run_models'}
+    }
+}
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -146,3 +167,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'PAGE_SIZE': 30
+}

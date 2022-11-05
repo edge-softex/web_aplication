@@ -13,20 +13,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from email.mime import base
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
 from photovoltaic import views as photovoltaic_views
 
-router = routers.DefaultRouter()
-router.register(r'pvdata', photovoltaic_views.PVViewSet)
-router.register(r'powerforecast', photovoltaic_views.PowerForecastSet)
-router.register(r'yieldday', photovoltaic_views.YieldDaySet)
-router.register(r'yieldmonth', photovoltaic_views.YieldMonthSet)
-router.register(r'yieldyear', photovoltaic_views.YieldYearSet)
+api_router = routers.DefaultRouter()
+api_router.register(r'users', photovoltaic_views.UserViewSet)
+api_router.register(r'accounts', photovoltaic_views.AccountsViewSet, basename='accounts')
+api_router.register(r'pvdata', photovoltaic_views.PVDataViewSet)
+api_router.register(r'pvstring', photovoltaic_views.PVStringViewSet)
+api_router.register(r'powerforecast', photovoltaic_views.PowerForecastViewSet)
+api_router.register(r'yieldday', photovoltaic_views.YieldDayViewSet)
+api_router.register(r'yieldmonth', photovoltaic_views.YieldMonthViewSet)
+api_router.register(r'yieldyear', photovoltaic_views.YieldYearViewSet)
+api_router.register(r'yieldminute', photovoltaic_views.YieldMinuteViewSet)
+api_router.register(r'alerttreshold', photovoltaic_views.AlertTresholdViewSet)
+api_router.register(r'settings', photovoltaic_views.SettingsViewSet)
+api_router.register(r'log', photovoltaic_views.LogViewSet)
+api_router.register(r'external', photovoltaic_views.ExternalAPIViweSet, basename='external')
+
+external_router = routers.DefaultRouter()
+external_router.register(r'apiactions', photovoltaic_views.ExternalAPIViweSet, basename='apiactions')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+    path('api/', include(api_router.urls)),
 ]
