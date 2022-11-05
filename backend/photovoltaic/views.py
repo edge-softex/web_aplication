@@ -600,8 +600,8 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         """
 
         now = timestamp_aware()
-        datetime_lte = stringify_datetime(now)
-        datetime_gte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
+        datetime_gte = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', stringify_datetime(now))
+        datetime_lte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
         yield_today = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldMinuteSerializer(yield_today, many=True).data)
