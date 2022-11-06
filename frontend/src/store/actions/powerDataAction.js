@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import axios from 'axios';
 import { API_URL, API_TOKEN } from '../../network';
 import { insertPowerData, isLaodingPower, isPowerLoaded } from '../reducers/powerDataSlice';
@@ -14,6 +15,7 @@ export function getPowerData() {
         Authorization: `Token ${API_TOKEN}`,
       },
     }).then(({ data }) => {
+      // eslint-disable-next-line no-console
       console.log('Authenticated');
       dispatch(insertPowerData(data));
     });

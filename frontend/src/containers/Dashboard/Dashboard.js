@@ -19,6 +19,7 @@ function Dashboard() {
     dispatch(getPowerData());
   }, []);
 
+  // eslint-disable-next-line no-console
   console.log(powerData);
 
   return (
@@ -49,7 +50,7 @@ function Dashboard() {
           height={439}
           title="Instant Power"
         >
-          <LineChart powerData/>
+          <LineChart powerData />
         </Card>
         <Card
           minWidth={400}
