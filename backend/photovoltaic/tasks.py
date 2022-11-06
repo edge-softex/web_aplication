@@ -221,6 +221,10 @@ def set_data(self, request_data):
     strings_ref = []
 
     data_timestamp = request_data['timestamp']
+    data_time = datetime.strptime(request_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
+
+    if(data_time.microsecond == 0):
+        data_time = data_time + timedelta(milliseconds=0.001)
 
     if request_data['temperature_pv'] is not None:
         temperature = request_data['temperature_pv']
@@ -240,7 +244,7 @@ def set_data(self, request_data):
         else:
             string_power = string['power']
         string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
-                                timestamp=data_timestamp,
+                                timestamp=stringify_datetime(data_time),
                                 voltage=string['voltage'],
                                 current=string['current'],
                                 power=string_power,
@@ -249,7 +253,7 @@ def set_data(self, request_data):
                                 string_number=string['string_number'])
         strings_ref.append(string_obj)
 
-    data = PVData.objects.create(timestamp=data_timestamp,
+    data = PVData.objects.create(timestamp=stringify_datetime(data_time),
                                 irradiance=request_data['irradiance'],
                                 temperature_pv=request_data['temperature_pv'],
                                 temperature_amb=request_data['temperature_amb'])
