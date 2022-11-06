@@ -9,7 +9,7 @@ function Consumption(props) {
   return (
     <div className="consumption_div-container">
       <h2 className={`consumption_h2 ${type}`}>{`${children} Wh`}</h2>
-      <h3 className="consumption_h3-type">{type === 'current' ? 'Current consumption' : 'Current forecast'}</h3>
+      <h3 className="consumption_h3-type">{type === 'current' ? 'Current generation' : 'Current forecast'}</h3>
     </div>
   );
 }

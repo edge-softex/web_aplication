@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { useSelector } from 'react-redux';
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +38,10 @@ const options = {
     title: {
       display: false,
     },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+    },
   },
   scales: {
     y: {
@@ -58,34 +63,41 @@ const options = {
         font: {
           size: 14,
         },
+        maxTicksLimit: 10,
       },
     },
   },
 };
 
-const data = {
-  labels: ['um', 'dois', 'três', 'quatro', 'cinco'],
-  datasets: [
-    {
-      label: 'Consumed',
-      data: [1, 2, 3, 4, 5],
-      borderColor: '#173C6C',
-      backgroundColor: '#173C6C',
-      borderWidth: 2,
-    },
-    {
-      label: 'Forecast',
-      data: [2, 4, 6, 8, 10],
-      borderColor: '#F7A159',
-      backgroundColor: '#F7A159',
-      borderWidth: 2,
-    },
-  ],
-};
-
 function LineChart() {
+  let dataSet = useSelector((state) => state.power.powerData);
+  if (!dataSet) {
+    dataSet = { timestamp: ['None'], data: [0], forecast: [0] };
+  }
+  const { timestamp, data, forecast } = dataSet;
+
+  const chartData = {
+    labels: { timestamp }.timestamp,
+    datasets: [
+      {
+        label: 'Generated',
+        data: { data }.data,
+        borderColor: '#173C6C',
+        backgroundColor: '#173C6C',
+        borderWidth: 2,
+      },
+      {
+        label: 'Forecast',
+        data: { forecast }.forecast,
+        borderColor: '#F7A159',
+        backgroundColor: '#F7A159',
+        borderWidth: 2,
+      },
+    ],
+  };
+
   return (
-    <Line options={options} data={data} />
+    <Line options={options} data={chartData} />
   );
 }
 

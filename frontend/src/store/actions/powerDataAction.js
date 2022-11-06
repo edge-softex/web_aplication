@@ -3,10 +3,10 @@ import { API_URL, API_TOKEN } from '../../network';
 import { insertPowerData, isLaodingPower, isPowerLoaded } from '../reducers/powerDataSlice';
 
 export function getPowerData() {
-  const sessionURL = `${API_URL}/pvdata/powerday/`;
+  const sessionURL = `${API_URL}/pvdata/powerday/?time_interval=25`;
 
   return async (dispatch) => {
-    dispatch(isLaodingPower(false));
+    dispatch(isLaodingPower(true));
     dispatch(isPowerLoaded(false));
 
     return axios.get(sessionURL, {
@@ -14,8 +14,9 @@ export function getPowerData() {
         Authorization: `Token ${API_TOKEN}`,
       },
     }).then(({ data }) => {
-      console.log('Authenticated');
       dispatch(insertPowerData(data));
+      dispatch(isLaodingPower(false));
+      dispatch(isPowerLoaded(true));
     });
 
     // { data: [1, 2, 3, 4, 5] },

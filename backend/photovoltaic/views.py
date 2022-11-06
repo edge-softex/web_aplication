@@ -298,7 +298,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], url_path='powerday', detail=False)
     def power_day(self, request):
-        """Returns the power data of the last 24 hours (max 1440 datasets).
+        """Returns the power data and power forecast of the last 24 hours (max 1440 datasets).
         
         :rtype: Response
         :return: list of PVData (timestamp, power_avr)
@@ -310,9 +310,36 @@ class PVDataViewSet(viewsets.ModelViewSet):
         datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(minutes=time_interval)
         datetime_gte = stringify_datetime(yesterday)
-        power_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
-        return Response(PVDataPowerSerializer(power_data, many=True).data)
+        power_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        power_json = PVDataSerializer(power_data, many=True).data
+
+        yesterday = now - timedelta(minutes=time_interval+1)
+        datetime_gte = stringify_datetime(yesterday)
+        
+        power_forecast = PowerForecast.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        forecast_json = generate_forecast_json(PowerForecastSerializer(power_forecast, many=True).data)
+
+        power_timestamp = [item['timestamp'].split('.')[0] for item in power_json]
+        power_avg = [item['power_avg'] for item in power_json]
+
+        fc_timestamp = [item['timestamp'].split('.')[0] for item in forecast_json]
+        forecast = [item['forecast'] for item in forecast_json]
+
+        if(power_timestamp):
+            if(power_timestamp[0] != fc_timestamp[0]):
+                fc_timestamp.insert(0, power_timestamp[0])
+
+        if(len(fc_timestamp) > len(forecast)):
+            forecast.insert(0, 0)
+
+        data_json = {
+            'timestamp': fc_timestamp,
+            'data': power_avg,
+            'forecast': forecast 
+        }
+
+        return Response(data_json)
 
     @action(methods=['GET'], url_path='history', detail=False)
     def pv_data_history(self, request):

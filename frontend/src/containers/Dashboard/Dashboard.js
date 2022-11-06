@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { getPowerData } from '../../store/actions/powerDataAction';
 
@@ -12,14 +12,19 @@ import HalfDoughnutChart from '../../components/atoms/halfDoughnutChart/HalfDoug
 import './Dashboard.css';
 
 function Dashboard() {
-  const powerData = useSelector((state) => state.power.powerData);
+  // const powerData = useSelector((state) => state.power.powerData);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getPowerData());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getPowerData());
+  // }, []);
 
-  console.log(powerData);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(getPowerData());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="dashboard-div">
@@ -49,7 +54,7 @@ function Dashboard() {
           height={439}
           title="Instant Power"
         >
-          <LineChart powerData/>
+          <LineChart />
         </Card>
         <Card
           minWidth={400}
