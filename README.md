@@ -30,3 +30,11 @@ You can run a task to simulate the input of PV data in the Django admin page
 3. Put a name of your choice and select "photovoltaic.tasks.simulate_input" in Task (registered)
 4. Create a 1-minute Interval Schedule
 5. Lastly, save
+
+## GCP
+```  
+docker-compose -f docker-compose-gcp.yaml build 
+```
+```  
+docker-compose -f docker-compose-gcp.yaml up
+```
