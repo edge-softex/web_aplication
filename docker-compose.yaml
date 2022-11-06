@@ -48,6 +48,8 @@ services:
     container_name: frontend
     restart: always
     command : npm start
+    environment:
+      - PUBLIC_URL="http://localhost:8000/api"
     build:
       context: ./frontend/
       dockerfile: Dockerfile
