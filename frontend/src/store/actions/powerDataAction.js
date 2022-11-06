@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import axios from 'axios';
 import { API_URL, API_TOKEN } from '../../network';
 import { insertPowerData, isLaodingPower, isPowerLoaded } from '../reducers/powerDataSlice';

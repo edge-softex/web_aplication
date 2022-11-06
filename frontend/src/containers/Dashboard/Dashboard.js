@@ -19,12 +19,17 @@ function Dashboard() {
   //   dispatch(getPowerData());
   // }, []);
 
+<<<<<<< HEAD
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(getPowerData());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+=======
+  // eslint-disable-next-line no-console
+  console.log(powerData);
+>>>>>>> b0c75db384aa42099aa32d6aac86c60c090d8a58
 
   return (
     <div className="dashboard-div">
@@ -54,7 +59,11 @@ function Dashboard() {
           height={439}
           title="Instant Power"
         >
+<<<<<<< HEAD
           <LineChart />
+=======
+          <LineChart powerData />
+>>>>>>> b0c75db384aa42099aa32d6aac86c60c090d8a58
         </Card>
         <Card
           minWidth={400}
