@@ -1,0 +1,27 @@
+.Button_button-Button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 15px 19px;
+    gap: 8px;
+
+    width: 164px;
+    height: 48px;
+
+
+    background: #FFFFFF;
+
+    border: 1px solid #2C3B48;
+    border-radius: 3px;
+}
+
+.Button_button-Button:active {
+    box-shadow: inset 0px 0px 1px 1px black;
+}
+
+.FooterHistoric_p-rightContent {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: #2C3B48;
+}

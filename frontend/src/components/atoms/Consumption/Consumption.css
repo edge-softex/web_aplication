@@ -1,0 +1,33 @@
+.consumption_div-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-right: 5%;
+    min-width: 8rem;
+}
+
+.consumption_h2 {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.8rem;
+    letter-spacing: -0.0375em;
+    margin: 0;
+}
+
+.current {
+    color: #0B1354;
+}
+
+.forecast {
+    color: #F7A159;
+}
+
+.consumption_h3-type {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.8rem;
+    line-height: 1rem;
+    color: #556F83;
+}

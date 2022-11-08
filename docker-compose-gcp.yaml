@@ -1,0 +1,105 @@
+version: "3.2"
+services:
+  pgsql:
+    container_name: pgsql
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_USER: softex_forecast
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: softex_forecast
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - db-net
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - db-net
+    environment:
+     - RABBITMQ_ERLANG_COOKIE=This_is_my_secret_phrase
+     - RABBITMQ_DEFAULT_USER=softex_forecast
+     - RABBITMQ_DEFAULT_PASS=123456
+     - CLUSTERED=true
+
+  backend:
+    container_name: backend
+    restart: always
+    command : bash -c "python manage.py migrate &&
+                      python manage.py runserver 0.0.0.0:8000"
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgsql
+      - rabbitmq
+    networks:
+      - db-net
+
+  frontend:
+    container_name: frontend
+    restart: always
+    command : npm start
+    environment:
+      - PUBLIC_URL="http://34.151.229.173:8000/api"
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "80:3000"
+    stdin_open: true
+    depends_on:
+      - backend
+    networks:
+      - db-net
+
+  worker:
+    container_name: worker
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    volumes:
+      - ./backend:/app/backend
+    command: celery -A api worker --pool=gevent -l info -Q celery,input_data,run_models
+    depends_on:
+      - backend
+    networks:
+      - db-net
+
+  trainer:
+    container_name: trainer
+    build:
+      context: .
+      dockerfile: Dockerfile-trainer  
+    volumes:
+      - ./backend:/app/backend
+    command: celery -A api worker --pool=gevent -l info -Q training_model --purge
+    depends_on:
+      - backend
+    networks:
+      - db-net
+
+
+  beat:
+    container_name: beat
+    build: ./backend
+    volumes:
+      - ./backend:/app/backend
+    command: celery -A api beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - backend
+    networks:
+      - db-net
+
+networks:
+  db-net:
+volumes:
+  postgres-data:

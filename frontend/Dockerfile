@@ -4,12 +4,7 @@ WORKDIR /app/frontend
 COPY package.json package-lock.json ./
 
 RUN npm install 
-RUN npm install react-scripts@3.4.1 -g 
-RUN npm install @material-ui/core
-RUN npm install @material-ui/icons
-RUN npm install bootstrap
-RUN npm install recharts
-RUN npm install axios
+RUN npm install react-scripts@3.4.1 -g
 
 COPY . ./
 

@@ -1,27 +1,24 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Box from '@material-ui/core/Box';
-import TopBar from "./topbar/TopBar"
-import Dashboard from "./dashboard/Dashboard"
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    backgroundColor: '#f0f2f5',
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  }
-}));
+import './App.css';
+
+import Dashboard from './containers/Dashboard/Dashboard';
+import Layout from './HighOrderComponents/Layout/Layout';
+import Historic from './containers/Historic/Historic';
+import Settings from './containers/Settings/Settings';
 
 function App() {
-
-  const classes = useStyles();
-
   return (
-    <Box component="main" className={classes.root}>
-      <TopBar />
-      <Dashboard />
-    </Box>
+    <div className="App">
+      <Layout>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/history" element={<Historic />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </Layout>
+    </div>
   );
 }
 

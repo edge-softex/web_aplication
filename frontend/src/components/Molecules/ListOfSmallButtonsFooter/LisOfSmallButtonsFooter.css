@@ -1,0 +1,8 @@
+.LisOfSmallButtonsFooter_div-container {
+    width: 70%;
+    height: 80px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+}

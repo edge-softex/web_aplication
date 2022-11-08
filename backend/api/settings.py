@@ -59,9 +59,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-]
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:3000',
+#     'http://localhost:443',
+#     'http://34.151.229.173:443',
+#     'http://34.151.229.173:8000',
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'api.urls'
 
@@ -149,11 +154,11 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(0, 0, month_of_year='*/3'),
         'options': {'queue': 'training_model'}
     },
-    'ai_model_inference': {
-        'task': 'photovoltaic.tasks.instant_power_forecast',
-        'schedule':timedelta(minutes=1),
-        'options': {'queue': 'run_models'}
-    }
+    # 'ai_model_inference': {
+    #     'task': 'photovoltaic.tasks.instant_power_forecast',
+    #     'schedule':timedelta(minutes=1),
+    #     'options': {'queue': 'run_models'}
+    # }
 }
 
 
@@ -169,12 +174,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication'
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework.authentication.SessionAuthentication',
+    #     'rest_framework.authentication.TokenAuthentication'
+    # ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'PAGE_SIZE': 30
 }

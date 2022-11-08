@@ -1,0 +1,56 @@
+.searchcard_div-container {
+    background-color: #FFFFFF;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 427px;
+    border-radius: 10px;
+    padding: 5px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 0 30px 0;
+}
+
+.head_div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 30%;
+    padding: 0 30px 0 30px;
+}
+
+.head_div-left {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    width: 25%;
+    height: 60%;
+}
+
+.searchcard_svg-search {
+    position: relative;
+    left: 35px;
+    margin-bottom: 16px;
+}
+
+.head_div-right {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-end;
+    width: 75%;
+    height: 60%;
+}
+
+.searchcard_div-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 70%;
+}
