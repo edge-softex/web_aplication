@@ -302,7 +302,10 @@ def set_data(self, request_data):
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def instant_power_forecast(self):
-    #Get data
+    """ Function that uses a neural network model to process 120 minutes of irradiance, temperature of the PV module and instant power data to forecasts 5 minute of instant power. Then saves it in the database.
+    """
+
+
     tz = timezone(settings.TIME_ZONE)
     datetime_now = tz.localize(datetime.now())
     
@@ -339,6 +342,8 @@ def instant_power_forecast(self):
     
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def model_retraining(self):
+    """ Function that retrains the neural network then calls the "model_updating" task.
+    """
     st, created = Settings.objects.get_or_create(id=1)    
     
     tz = timezone(settings.TIME_ZONE)
@@ -364,6 +369,8 @@ def model_retraining(self):
     
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def model_updating(self):
+    """ Function that indicates that the neural network model needs to be updated in the "instant_power_forecast" task.
+    """
     algs = AIAlgorithm.objects.all()
     
     alg_index = 0
