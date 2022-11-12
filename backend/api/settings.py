@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'photovoltaic',
     'django_celery_beat',
     'django_celery_results',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'django.contrib.admindocs'
 ]
 
 MIDDLEWARE = [
