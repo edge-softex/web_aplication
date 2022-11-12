@@ -4,7 +4,7 @@ import { API_URL, API_TOKEN } from '../../network';
 import { insertPowerData, isLaodingPower, isPowerLoaded } from '../reducers/powerDataSlice';
 
 function getPowerData() {
-  const sessionURL = `${API_URL}/pvdata/powerday/?time_interval=25`;
+  const sessionURL = `${API_URL}/pvdata/powerday/?time_interval=360`;
 
   return async (dispatch) => {
     dispatch(isLaodingPower(true));
