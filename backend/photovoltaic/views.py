@@ -630,8 +630,17 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         datetime_gte = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', stringify_datetime(now))
         datetime_lte = re.sub(r'\d\d:\d\d:\d\d.\d+', '23:59:59.999999', stringify_datetime(now))
         yield_today = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        yield_json = YieldMinuteSerializer(yield_today, many=True).data
 
-        return Response(YieldMinuteSerializer(yield_today, many=True).data)
+        timestamp = [item['timestamp'].split('.')[0] for item in yield_json]
+        yield_minute = [item['yield_minute'] for item in yield_json]
+
+        data_json = {
+            'timestamp': timestamp,
+            'data': yield_minute
+        }
+
+        return Response(data_json)
 
     @action(methods=['GET'], url_path='history', detail=False)
     def yield_minute_history(self, request):

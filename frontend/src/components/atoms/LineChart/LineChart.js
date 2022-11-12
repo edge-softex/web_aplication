@@ -10,7 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { useSelector } from 'react-redux';
+import PropTypes, { number, string } from 'prop-types';
 
 ChartJS.register(
   CategoryScale,
@@ -69,12 +69,20 @@ const options = {
   },
 };
 
-function LineChart() {
-  let dataSet = useSelector((state) => state.power.powerData);
-  if (!dataSet) {
-    dataSet = { timestamp: ['None'], data: [0], forecast: [0] };
+function LineChart(props) {
+  const { timestamp, data, forecast } = props;
+
+  let forecastDataSet = {};
+
+  if ({ forecast }.forecast) {
+    forecastDataSet = {
+      label: 'Forecast',
+      data: { forecast }.forecast,
+      borderColor: '#F7A159',
+      backgroundColor: '#F7A159',
+      borderWidth: 2,
+    };
   }
-  const { timestamp, data, forecast } = dataSet;
 
   const chartData = {
     labels: { timestamp }.timestamp,
@@ -86,13 +94,7 @@ function LineChart() {
         backgroundColor: '#173C6C',
         borderWidth: 2,
       },
-      {
-        label: 'Forecast',
-        data: { forecast }.forecast,
-        borderColor: '#F7A159',
-        backgroundColor: '#F7A159',
-        borderWidth: 2,
-      },
+      forecastDataSet,
     ],
   };
 
@@ -100,5 +102,11 @@ function LineChart() {
     <Line options={options} data={chartData} />
   );
 }
+
+LineChart.propTypes = {
+  timestamp: PropTypes.arrayOf(string).isRequired,
+  data: PropTypes.arrayOf(number).isRequired,
+  forecast: PropTypes.arrayOf(number).isRequired,
+};
 
 export default LineChart;

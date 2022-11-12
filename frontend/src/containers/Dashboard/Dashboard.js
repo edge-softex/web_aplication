@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { getPowerData } from '../../store/actions/powerDataAction';
+import getPowerData from '../../store/actions/powerDataAction';
+import getYieldData from '../../store/actions/yieldDataAction';
 
 import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/Card/Card';
@@ -12,7 +13,8 @@ import HalfDoughnutChart from '../../components/atoms/halfDoughnutChart/HalfDoug
 import './Dashboard.css';
 
 function Dashboard() {
-  // const powerData = useSelector((state) => state.power.powerData);
+  const powerData = useSelector((state) => state.power.powerData);
+  const yieldData = useSelector((state) => state.yield.yieldData);
   const dispatch = useDispatch();
 
   // useEffect(() => {
@@ -22,6 +24,7 @@ function Dashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(getPowerData());
+      dispatch(getYieldData());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -37,14 +40,22 @@ function Dashboard() {
           width="35%"
           height={439}
           title="Yield Today"
+          data={yieldData.data[yieldData.data.length - 1]}
+          forecast={0}
         >
-          <LineChart />
+          <LineChart
+            timestamp={yieldData.timestamp}
+            data={yieldData.data}
+            forecast={[]}
+          />
         </Card>
         <Card
           minWidth={604}
           width="57%"
           height={439}
           title="Yield History"
+          data={0}
+          forecast={0}
         >
           <BarChart />
         </Card>
@@ -53,30 +64,50 @@ function Dashboard() {
           width="57%"
           height={439}
           title="Instant Power"
+          data={powerData.data[powerData.data.length - 1]}
+          forecast={powerData.forecast[powerData.forecast.length - 6]}
         >
-          <LineChart />
+          <LineChart
+            timestamp={powerData.timestamp}
+            data={powerData.data}
+            forecast={powerData.forecast}
+          />
         </Card>
         <Card
           minWidth={400}
           width="35%"
           height={439}
-          title="Yield Today"
+          title="Strings"
+          data={0}
+          forecast={0}
         >
-          <LineChart />
+          <LineChart
+            timestamp={[]}
+            data={[]}
+            forecast={[]}
+          />
         </Card>
         <Card
           minWidth={400}
           width="35%"
           height={439}
-          title="Yield Today"
+          title="Irradiance"
+          data={0}
+          forecast={0}
         >
-          <LineChart />
+          <LineChart
+            timestamp={[]}
+            data={[]}
+            forecast={[]}
+          />
         </Card>
         <Card
           minWidth={400}
           width="35%"
           height={439}
-          title="Yield Today"
+          title="Pv cell temperature"
+          data={0}
+          forecast={0}
         >
           <HalfDoughnutChart />
         </Card>
@@ -84,7 +115,9 @@ function Dashboard() {
           minWidth={400}
           width="35%"
           height={439}
-          title="Yield Today"
+          title="Abient temperature"
+          data={0}
+          forecast={0}
         >
           <HalfDoughnutChart />
         </Card>

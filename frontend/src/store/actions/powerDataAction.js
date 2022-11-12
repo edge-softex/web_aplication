@@ -3,7 +3,7 @@ import axios from 'axios';
 import { API_URL, API_TOKEN } from '../../network';
 import { insertPowerData, isLaodingPower, isPowerLoaded } from '../reducers/powerDataSlice';
 
-export function getPowerData() {
+function getPowerData() {
   const sessionURL = `${API_URL}/pvdata/powerday/?time_interval=25`;
 
   return async (dispatch) => {
@@ -19,10 +19,7 @@ export function getPowerData() {
       dispatch(isLaodingPower(false));
       dispatch(isPowerLoaded(true));
     });
-
-    // { data: [1, 2, 3, 4, 5] },
-    // { label: [1, 2, 3, 4, 5] },
   };
 }
 
-export function teste() {}
+export default getPowerData;

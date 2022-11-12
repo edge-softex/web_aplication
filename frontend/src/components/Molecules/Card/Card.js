@@ -13,6 +13,8 @@ function Card(props) {
     width,
     height,
     title,
+    data,
+    forecast,
   } = props;
 
   return (
@@ -29,8 +31,8 @@ function Card(props) {
           <CardTitle>{title}</CardTitle>
         </div>
         <div className="card_div-consumption">
-          <Consumption type="current">60</Consumption>
-          <Consumption type="forecast">300</Consumption>
+          <Consumption type="current">{data.toFixed(2)}</Consumption>
+          <Consumption type="forecast">{forecast.toFixed(2)}</Consumption>
         </div>
       </div>
       <div className="card_div-body">
@@ -52,6 +54,8 @@ Card.propTypes = {
   ]).isRequired,
   height: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
+  data: PropTypes.number.isRequired,
+  forecast: PropTypes.number.isRequired,
 };
 
 export default Card;

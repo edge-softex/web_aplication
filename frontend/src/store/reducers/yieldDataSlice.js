@@ -1,12 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-export const powerSlice = createSlice({
-  name: 'power',
+export const yieldSlice = createSlice({
+  name: 'yield',
   initialState: {
-    powerData: {
+    yieldData: {
       timestamp: ['none', 'none', 'none', 'none', 'none', ' none'],
       data: [0],
-      forecast: [0, 0, 0, 0, 0, 0],
     },
     auth: {
       dataLoading: false,
@@ -14,13 +13,13 @@ export const powerSlice = createSlice({
     },
   },
   reducers: {
-    insertPowerData(state, action) {
-      state.powerData = action.payload;
+    insertYieldData(state, action) {
+      state.yieldData = action.payload;
     },
-    isLaodingPower(state, action) {
+    isLaodingYield(state, action) {
       state.dataLoading = action.payload;
     },
-    isPowerLoaded(state, action) {
+    isYieldLoaded(state, action) {
       state.dataLoaded = action.payload;
     },
   },
@@ -28,7 +27,7 @@ export const powerSlice = createSlice({
 
 // Action creators are generated for each case reducer function
 export const {
-  insertPowerData, isLaodingPower, isPowerLoaded,
-} = powerSlice.actions;
+  insertYieldData, isLaodingYield, isYieldLoaded,
+} = yieldSlice.actions;
 
-export default powerSlice.reducer;
+export default yieldSlice.reducer;
