@@ -64,7 +64,7 @@ function Dashboard() {
           width="57%"
           height={439}
           title="Instant Power"
-          data={powerData.data[powerData.data.length - 1]}
+          data={powerData.data[powerData.data.length - 6]}
           forecast={powerData.forecast[powerData.forecast.length - 6]}
         >
           <LineChart

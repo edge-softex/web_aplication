@@ -5,7 +5,7 @@ export const powerSlice = createSlice({
   initialState: {
     powerData: {
       timestamp: ['none', 'none', 'none', 'none', 'none', ' none'],
-      data: [0],
+      data: [0, 0, 0, 0, 0, 0],
       forecast: [0, 0, 0, 0, 0, 0],
     },
     auth: {

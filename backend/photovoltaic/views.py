@@ -333,10 +333,46 @@ class PVDataViewSet(viewsets.ModelViewSet):
         if(len(fc_timestamp) > len(forecast)):
             forecast.insert(0, 0)
 
+        timestamp_list = []
+
+        for i in range(0, len(power_timestamp)):
+            p_datatime = datetime.strptime(power_timestamp[i], '%Y-%m-%dT%H:%M:%S').replace(second=0, microsecond=0)
+            power_timestamp[i] = p_datatime
+            timestamp_list.append(p_datatime)
+
+        for i in range(0, len(fc_timestamp)):
+            fc_datatime = datetime.strptime(fc_timestamp[i], '%Y-%m-%dT%H:%M:%S').replace(second=0, microsecond=0)
+            fc_timestamp[i] = fc_datatime
+            timestamp_list.append(fc_datatime)
+
+        timestamp_list = sorted(timestamp_list)
+        timestamp_list = list(dict.fromkeys(timestamp_list))
+
+        aux_power = [None] * len(timestamp_list)
+        aux_forecast = [None] * len(timestamp_list)
+
+        for i in range(0, len(timestamp_list)):
+            for j in range(0, len(power_timestamp)):
+                print(type(timestamp_list[i]))
+                print(timestamp_list[i])
+                print(type(power_timestamp[j]))
+                print(power_timestamp[j])
+                if power_timestamp[j] == timestamp_list[i]:
+                    aux_power[i] = power_avg[j]
+                    break
+
+            for j in range(0, len(fc_timestamp)):
+                if fc_timestamp[j] == timestamp_list[i]:
+                    aux_forecast[i] = forecast[j]
+                    break
+
+        for time in timestamp_list:
+            time = stringify_datetime(time).split('.')[0]
+
         data_json = {
-            'timestamp': fc_timestamp,
-            'data': power_avg,
-            'forecast': forecast 
+            'timestamp': timestamp_list,
+            'data': aux_power,
+            'forecast': aux_forecast 
         }
 
         return Response(data_json)

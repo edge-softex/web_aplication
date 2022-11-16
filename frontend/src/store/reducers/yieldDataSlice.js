@@ -4,7 +4,7 @@ export const yieldSlice = createSlice({
   name: 'yield',
   initialState: {
     yieldData: {
-      timestamp: ['none', 'none', 'none', 'none', 'none', ' none'],
+      timestamp: ['none'],
       data: [0],
     },
     auth: {
