@@ -353,10 +353,6 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         for i in range(0, len(timestamp_list)):
             for j in range(0, len(power_timestamp)):
-                print(type(timestamp_list[i]))
-                print(timestamp_list[i])
-                print(type(power_timestamp[j]))
-                print(power_timestamp[j])
                 if power_timestamp[j] == timestamp_list[i]:
                     aux_power[i] = power_avg[j]
                     break
@@ -368,6 +364,15 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         for time in timestamp_list:
             time = stringify_datetime(time).split('.')[0]
+
+        if not timestamp_list:
+            timestamp_list = ['None', 'None', 'None', 'None', 'None', 'None']
+
+        if not aux_power:
+            aux_power = [0, 0, 0, 0, 0, 0]
+
+        if not aux_forecast:
+            aux_forecast = [0, 0, 0, 0, 0, 0]
 
         data_json = {
             'timestamp': timestamp_list,

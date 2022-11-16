@@ -31,13 +31,13 @@ def createLog(self, exc, task_id, args, kwargs, einfo):
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def simulate_input(self):
     """Simulates data entry to perform system tests."""
-    
-    df = read_dat_file('./photovoltaic/fixtures/test_day.dat')
-    #df = read_dat_file('./photovoltaic/fixtures/test_day_actual.dat')
-    
+
     tz = timezone(settings.TIME_ZONE)
     datetime_now = tz.localize(datetime.now())
     datetime_string = str(datetime_now).replace(' ', 'T')
+    
+    df = read_dat_file('./photovoltaic/fixtures/{}.dat'.format(datetime_now.day))
+    #df = read_dat_file('./photovoltaic/fixtures/test_day_actual.dat')
 
     index = datetime_now.hour*60 + datetime_now.minute
 
@@ -98,7 +98,7 @@ def simulate_input(self):
     power4 = float(df.iloc[[index+4]]['Potencia_FV_Avg'])
     power5 = float(df.iloc[[index+5]]['Potencia_FV_Avg'])
 
-    simulate_model.apply_async(args=[datetime_now, power1, power2, power3, power4, power5], kwargs={}, queue='run_models')
+    instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
@@ -218,87 +218,89 @@ def set_data(self, request_data):
     tupe request_data: json
     """
 
-    strings_ref = []
+    pass
 
-    data_timestamp = request_data['timestamp']
-    data_time = datetime.strptime(request_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
+    # strings_ref = []
 
-    if(data_time.microsecond == 0):
-        data_time = data_time + timedelta(milliseconds=0.001)
+    # data_timestamp = request_data['timestamp']
+    # data_time = datetime.strptime(request_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
 
-    if request_data['temperature_pv'] is not None:
-        temperature = request_data['temperature_pv']
-    elif request_data['temperature_amb'] is not None:
-        temperature = request_data['temperature_amb']
-    else:
-        temperature = 0
+    # if(data_time.microsecond == 0):
+    #     data_time = data_time + timedelta(milliseconds=0.001)
 
-    if request_data['irradiance'] is not None:
-        irradiance = request_data['irradiance']
-    else:
-        irradiance = 0 
+    # if request_data['temperature_pv'] is not None:
+    #     temperature = request_data['temperature_pv']
+    # elif request_data['temperature_amb'] is not None:
+    #     temperature = request_data['temperature_amb']
+    # else:
+    #     temperature = 0
 
-    for string in request_data['strings']:
-        if string['power'] is None and string['voltage'] is not None and string['current'] is not None:
-            string_power = string['voltage'] * string['current']
-        else:
-            string_power = string['power']
-        string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
-                                timestamp=stringify_datetime(data_time),
-                                voltage=string['voltage'],
-                                current=string['current'],
-                                power=string_power,
-                                voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
-                                current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
-                                string_number=string['string_number'])
-        strings_ref.append(string_obj)
+    # if request_data['irradiance'] is not None:
+    #     irradiance = request_data['irradiance']
+    # else:
+    #     irradiance = 0 
 
-    data = PVData.objects.create(timestamp=stringify_datetime(data_time),
-                                irradiance=request_data['irradiance'],
-                                temperature_pv=request_data['temperature_pv'],
-                                temperature_amb=request_data['temperature_amb'])
+    # for string in request_data['strings']:
+    #     if string['power'] is None and string['voltage'] is not None and string['current'] is not None:
+    #         string_power = string['voltage'] * string['current']
+    #     else:
+    #         string_power = string['power']
+    #     string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
+    #                             timestamp=stringify_datetime(data_time),
+    #                             voltage=string['voltage'],
+    #                             current=string['current'],
+    #                             power=string_power,
+    #                             voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
+    #                             current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
+    #                             string_number=string['string_number'])
+    #     strings_ref.append(string_obj)
 
-    data.strings.set(strings_ref)
+    # data = PVData.objects.create(timestamp=stringify_datetime(data_time),
+    #                             irradiance=request_data['irradiance'],
+    #                             temperature_pv=request_data['temperature_pv'],
+    #                             temperature_amb=request_data['temperature_amb'])
 
-    day = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', data_timestamp)
-    yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
+    # data.strings.set(strings_ref)
 
-    if request_data['generation'] is None and request_data['power_avr'] is None:
-        power = 0
-        energy = 0
-    elif request_data['generation'] is None and request_data['power_avr'] is not None:
-        power = request_data['power_avr']
-        energy = request_data['power_avr']*(1/60)/1000
-    elif request_data['generation'] is not None and request_data['power_avr'] is None:
-        energy = request_data['generation'] - yield_day.yield_day
-        power = energy*60*1000
-    else:
-        power = request_data['power_avr']
-        energy = request_data['generation'] - yield_day.yield_day
+    # day = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', data_timestamp)
+    # yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
 
-    data.power_avg = power
-    data.save()
+    # if request_data['generation'] is None and request_data['power_avr'] is None:
+    #     power = 0
+    #     energy = 0
+    # elif request_data['generation'] is None and request_data['power_avr'] is not None:
+    #     power = request_data['power_avr']
+    #     energy = request_data['power_avr']*(1/60)/1000
+    # elif request_data['generation'] is not None and request_data['power_avr'] is None:
+    #     energy = request_data['generation'] - yield_day.yield_day
+    #     power = energy*60*1000
+    # else:
+    #     power = request_data['power_avr']
+    #     energy = request_data['generation'] - yield_day.yield_day
 
-    yield_day.yield_day = yield_day.yield_day + energy #kWh
-    yield_day.yield_day_forecaste = 30 #TODO run generation forecast
-    yield_day.save()
+    # data.power_avg = power
+    # data.save()
 
-    yield_minute, created = YieldMinute.objects.get_or_create(timestamp=data_timestamp)
-    yield_minute.yield_minute = yield_day.yield_day #kWh
-    yield_minute.yield_day_forecaste = 30 #TODO run generation forecast
-    yield_minute.save()
+    # yield_day.yield_day = yield_day.yield_day + energy #kWh
+    # yield_day.yield_day_forecaste = 30 #TODO run generation forecast
+    # yield_day.save()
 
-    month = re.sub(r'\d\dT\d\d:\d\d:\d\d.\d+', '01T00:00:00.000000', data_timestamp)
-    yield_month, created = YieldMonth.objects.get_or_create(timestamp=month)
-    yield_month.yield_month = yield_month.yield_month + energy #kWh
-    yield_month.save()
+    # yield_minute, created = YieldMinute.objects.get_or_create(timestamp=data_timestamp)
+    # yield_minute.yield_minute = yield_day.yield_day #kWh
+    # yield_minute.yield_day_forecaste = 30 #TODO run generation forecast
+    # yield_minute.save()
 
-    year = re.sub(r'\d\d-\d\dT\d\d:\d\d:\d\d.\d+', '01-01T00:00:00.000000', data_timestamp)
-    yield_year, created = YieldYear.objects.get_or_create(timestamp=year)
-    yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
-    yield_year.save()
+    # month = re.sub(r'\d\dT\d\d:\d\d:\d\d.\d+', '01T00:00:00.000000', data_timestamp)
+    # yield_month, created = YieldMonth.objects.get_or_create(timestamp=month)
+    # yield_month.yield_month = yield_month.yield_month + energy #kWh
+    # yield_month.save()
 
-    instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
+    # year = re.sub(r'\d\d-\d\dT\d\d:\d\d:\d\d.\d+', '01-01T00:00:00.000000', data_timestamp)
+    # yield_year, created = YieldYear.objects.get_or_create(timestamp=year)
+    # yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
+    # yield_year.save()
+
+    # instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def instant_power_forecast(self):

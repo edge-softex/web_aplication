@@ -155,6 +155,11 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(0, 0, month_of_year='*/3'),
         'options': {'queue': 'training_model'}
     },
+    'insert_test_data': {
+        'task': 'photovoltaic.tasks.simulate_input',
+        'schedule':timedelta(minutes=1),
+        'options': {'queue': 'input_data'}
+    },
     # 'ai_model_inference': {
     #     'task': 'photovoltaic.tasks.instant_power_forecast',
     #     'schedule':timedelta(minutes=1),
