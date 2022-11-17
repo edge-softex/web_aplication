@@ -294,7 +294,21 @@ class PVDataViewSet(viewsets.ModelViewSet):
         datetime_gte = stringify_datetime(yesterday)
         day_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
-        return Response(PVDataMeteorologicalSerializer(day_data, many=True).data)
+        meteorological_data = PVDataMeteorologicalSerializer(day_data, many=True).data
+
+        timestamp = [item['timestamp'].split('.')[0] for item in meteorological_data]
+        irradiance = [item['irradiance'] for item in meteorological_data]
+        temperature_pv = [item['temperature_pv'] for item in meteorological_data]
+        temperature_amb = [item['temperature_amb'] for item in meteorological_data]
+
+        data_json = {
+            'timestamp': timestamp,
+            'irradiance': irradiance,
+            'temperature_pv': temperature_pv,
+            'temperature_amb': temperature_amb
+        }
+
+        return Response(data_json)
 
     @action(methods=['GET'], url_path='powerday', detail=False)
     def power_day(self, request):

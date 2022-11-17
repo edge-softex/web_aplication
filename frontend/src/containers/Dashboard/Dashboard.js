@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import getPowerData from '../../store/actions/powerDataAction';
 import getYieldData from '../../store/actions/yieldDataAction';
+import getMeteorologicalData from '../../store/actions/meteorologicalDataAction';
 
 import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/Card/Card';
@@ -15,6 +16,7 @@ import './Dashboard.css';
 function Dashboard() {
   const powerData = useSelector((state) => state.power.powerData);
   const yieldData = useSelector((state) => state.yield.yieldData);
+  const meteorologicalData = useSelector((state) => state.meteorological.meteorologicalData);
   const dispatch = useDispatch();
 
   // useEffect(() => {
@@ -25,6 +27,7 @@ function Dashboard() {
     const interval = setInterval(() => {
       dispatch(getPowerData());
       dispatch(getYieldData());
+      dispatch(getMeteorologicalData());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -92,31 +95,31 @@ function Dashboard() {
           width="35%"
           height={439}
           title="Irradiance"
-          data={0}
+          data={meteorologicalData.irradiance[meteorologicalData.irradiance.length - 1]}
           forecast={0}
         >
           <LineChart
-            timestamp={[]}
-            data={[]}
+            timestamp={meteorologicalData.timestamp}
+            data={meteorologicalData.irradiance}
             forecast={[]}
           />
         </Card>
         <Card
           minWidth={400}
-          width="35%"
+          width="27.5%"
           height={439}
           title="Pv cell temperature"
-          data={0}
+          data={meteorologicalData.temperature_pv[meteorologicalData.temperature_pv.length - 1]}
           forecast={0}
         >
           <HalfDoughnutChart />
         </Card>
         <Card
           minWidth={400}
-          width="35%"
+          width="27.5%"
           height={439}
           title="Abient temperature"
-          data={0}
+          data={meteorologicalData.temperature_amb[meteorologicalData.temperature_amb.length - 1]}
           forecast={0}
         >
           <HalfDoughnutChart />
