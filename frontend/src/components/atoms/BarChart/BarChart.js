@@ -9,6 +9,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import PropTypes, { number, string } from 'prop-types';
 
 ChartJS.register(
   CategoryScale,
@@ -32,21 +33,25 @@ export const options = {
   },
 };
 
-const labels = ['1', '2', '3', '4', '5'];
+function BarChart(props) {
+  const { timestamp, data } = props;
 
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: 'Dataset 1',
-      data: [1, 2, 3, 4, 5],
-      backgroundColor: '#173C6C',
-    },
-  ],
-};
+  const chartData = {
+    labels: { timestamp }.timestamp,
+    datasets: [
+      {
+        data: { data }.data,
+        backgroundColor: '#173C6C',
+      },
+    ],
+  };
 
-function BarChart() {
-  return <Bar options={options} data={data} />;
+  return <Bar options={options} data={chartData} />;
 }
+
+BarChart.propTypes = {
+  timestamp: PropTypes.arrayOf(string).isRequired,
+  data: PropTypes.arrayOf(number).isRequired,
+};
 
 export default BarChart;

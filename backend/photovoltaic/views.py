@@ -529,9 +529,9 @@ class YieldDayViewSet(viewsets.ModelViewSet):
         yield_today = YieldDay.objects.latest('timestamp')
         return Response(YieldDaySerializer(yield_today).data)
 
-    @action(methods=['GET'], url_path='latest15', detail=False)
-    def yield_latest_15(self, request):
-        """Returns the yield day data of the last 15 days.
+    @action(methods=['GET'], url_path='latest10', detail=False)
+    def yield_latest_10(self, request):
+        """Returns the yield day data of the last 10 days.
         
         :rtype: Response
         :return: list of YieldDay (timestamp, yield_day, yield_day_forecast)
@@ -539,11 +539,22 @@ class YieldDayViewSet(viewsets.ModelViewSet):
 
         now = timestamp_aware()
         datetime_lte = stringify_datetime(now)
-        yesterday = now - timedelta(days=15)
+        yesterday = now - timedelta(days=10)
         datetime_gte = stringify_datetime(yesterday)
         yield_days = YieldDay.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        yield_json = YieldDaySerializer(yield_days, many=True).data[-10: ]
 
-        return Response(YieldDaySerializer(yield_days, many=True).data)
+        timestamp = [item['timestamp'].split('T')[0] for item in yield_json]
+        yield_ = [item['yield_day'] for item in yield_json]
+        yield_day_forecast = [item['yield_day_forecast'] for item in yield_json]
+
+        data_json = {
+            'timestamp': timestamp,
+            'data': yield_,
+            'forecast': yield_day_forecast
+        }
+
+        return Response(data_json)
 
     @action(methods=['GET'], url_path='history', detail=False)
     def yield_day_history(self, request):

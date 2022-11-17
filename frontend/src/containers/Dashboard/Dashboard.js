@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import getPowerData from '../../store/actions/powerDataAction';
 import getYieldData from '../../store/actions/yieldDataAction';
 import getMeteorologicalData from '../../store/actions/meteorologicalDataAction';
+import getHistoryData from '../../store/actions/historyDataAction';
 
 import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/Card/Card';
@@ -17,12 +18,14 @@ function Dashboard() {
   const powerData = useSelector((state) => state.power.powerData);
   const yieldData = useSelector((state) => state.yield.yieldData);
   const meteorologicalData = useSelector((state) => state.meteorological.meteorologicalData);
+  const historyData = useSelector((state) => state.history.historyData);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getPowerData());
     dispatch(getYieldData());
     dispatch(getMeteorologicalData());
+    dispatch(getHistoryData());
   }, []);
 
   useEffect(() => {
@@ -30,6 +33,7 @@ function Dashboard() {
       dispatch(getPowerData());
       dispatch(getYieldData());
       dispatch(getMeteorologicalData());
+      dispatch(getHistoryData());
     }, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -63,7 +67,10 @@ function Dashboard() {
           showData={false}
           showForecast={false}
         >
-          <BarChart />
+          <BarChart
+            timestamp={historyData.timestamp}
+            data={historyData.data}
+          />
         </Card>
         <Card
           minWidth={604}
