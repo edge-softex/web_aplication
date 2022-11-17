@@ -19,16 +19,18 @@ function Dashboard() {
   const meteorologicalData = useSelector((state) => state.meteorological.meteorologicalData);
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   dispatch(getPowerData());
-  // }, []);
+  useEffect(() => {
+    dispatch(getPowerData());
+    dispatch(getYieldData());
+    dispatch(getMeteorologicalData());
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(getPowerData());
       dispatch(getYieldData());
       dispatch(getMeteorologicalData());
-    }, 1000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -44,7 +46,8 @@ function Dashboard() {
           height={439}
           title="Yield Today"
           data={yieldData.data[yieldData.data.length - 1]}
-          forecast={0}
+          unity="Wh"
+          showForecast={false}
         >
           <LineChart
             timestamp={yieldData.timestamp}
@@ -57,8 +60,8 @@ function Dashboard() {
           width="57%"
           height={439}
           title="Yield History"
-          data={0}
-          forecast={0}
+          showData={false}
+          showForecast={false}
         >
           <BarChart />
         </Card>
@@ -69,6 +72,7 @@ function Dashboard() {
           title="Instant Power"
           data={powerData.data[powerData.data.length - 6]}
           forecast={powerData.forecast[powerData.forecast.length - 6]}
+          unity="W"
         >
           <LineChart
             timestamp={powerData.timestamp}
@@ -81,8 +85,9 @@ function Dashboard() {
           width="35%"
           height={439}
           title="Strings"
-          data={0}
-          forecast={0}
+          unit="VA"
+          showData={false}
+          showForecast={false}
         >
           <LineChart
             timestamp={[]}
@@ -96,7 +101,8 @@ function Dashboard() {
           height={439}
           title="Irradiance"
           data={meteorologicalData.irradiance[meteorologicalData.irradiance.length - 1]}
-          forecast={0}
+          unity="W/m²"
+          showForecast={false}
         >
           <LineChart
             timestamp={meteorologicalData.timestamp}
@@ -110,7 +116,8 @@ function Dashboard() {
           height={439}
           title="Pv cell temperature"
           data={meteorologicalData.temperature_pv[meteorologicalData.temperature_pv.length - 1]}
-          forecast={0}
+          unity="℃"
+          showForecast={false}
         >
           <HalfDoughnutChart />
         </Card>
@@ -120,7 +127,8 @@ function Dashboard() {
           height={439}
           title="Abient temperature"
           data={meteorologicalData.temperature_amb[meteorologicalData.temperature_amb.length - 1]}
-          forecast={0}
+          unity="℃"
+          showForecast={false}
         >
           <HalfDoughnutChart />
         </Card>

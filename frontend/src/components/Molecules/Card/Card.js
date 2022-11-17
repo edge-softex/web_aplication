@@ -15,7 +15,20 @@ function Card(props) {
     title,
     data,
     forecast,
+    unity,
+    showData,
+    showForecast,
   } = props;
+
+  let dataValue = null;
+  if (showData) {
+    dataValue = <Consumption type="current" unity={unity}>{data.toFixed(2)}</Consumption>;
+  }
+
+  let forecastValue = null;
+  if (showForecast) {
+    forecastValue = <Consumption type="forecast" unity={unity}>{forecast.toFixed(2)}</Consumption>;
+  }
 
   return (
     <div
@@ -31,8 +44,8 @@ function Card(props) {
           <CardTitle>{title}</CardTitle>
         </div>
         <div className="card_div-consumption">
-          <Consumption type="current">{data.toFixed(2)}</Consumption>
-          <Consumption type="forecast">{forecast.toFixed(2)}</Consumption>
+          { dataValue }
+          { forecastValue }
         </div>
       </div>
       <div className="card_div-body">
@@ -54,8 +67,19 @@ Card.propTypes = {
   ]).isRequired,
   height: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
-  data: PropTypes.number.isRequired,
-  forecast: PropTypes.number.isRequired,
+  data: PropTypes.number,
+  forecast: PropTypes.number,
+  unity: PropTypes.string,
+  showData: PropTypes.bool,
+  showForecast: PropTypes.bool,
+};
+
+Card.defaultProps = {
+  data: 0,
+  forecast: 0,
+  unity: 'None',
+  showData: true,
+  showForecast: true,
 };
 
 export default Card;
