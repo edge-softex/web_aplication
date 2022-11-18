@@ -253,19 +253,24 @@ class PVDataViewSet(viewsets.ModelViewSet):
         delta = time_now - time_data
         minutes = delta / timedelta(minutes=1)
 
-        status = 'Normal Operation'
+        status_string = 'Normal'
+        status = 'normaloperation'
         if(minutes >= 3):
-            status = 'Offline'
+            status_string = 'Offline'
+            status = 'offline'
         else:
             for string in latest_data['strings']:
                 if string['voltage_alert'] == 'WA' or string['current_alert'] == 'WA':
-                    status = 'Warning Operation'
+                    status_string = 'Warning'
+                    status = 'warning'
                 if string['voltage_alert'] == 'FT' or string['current_alert'] == 'FT':
-                    status = 'Fault Operation'
+                    status_string = 'Fault'
+                    status = 'fault'
                     break
         
         json_response = {
-            'status': status
+            'status': status,
+            'status_string': status_string
         }
 
         return Response(json_response)

@@ -27,7 +27,7 @@
 }
 
 .normaloperation {
-    background-color: #5dff57;
+    background-color: #339900;
 }
 
 .offline {
@@ -35,11 +35,11 @@
 }
 
 .warning {
-    background-color: #fffc57;
+    background-color: #ffcc00;
 }
 
 .fault {
-    background-color: #FF5757;
+    background-color: #cc3300;
 }
 
 .systemstatus_h3 {
