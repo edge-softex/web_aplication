@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from api import settings
 
-from .models import AlertTreshold, Settings, Log
+from .models import AlertThreshold, Settings, Log
 
 def read_dat_file(filename):
     """Read .dat file, discards some row headers and returns appropriate values.
@@ -189,15 +189,15 @@ def alert_definition(alert_type, string_number, meteorological_value, value):
     st = Settings.objects.get_or_create(id=1)
 
     try:
-        threshold = AlertTreshold.objects.get(alert_type=alert_type, string_number=string_number, meteorological_value=round(meteorological_value))
+        threshold = AlertThreshold.objects.get(alert_type=alert_type, string_number=string_number, meteorological_value=round(meteorological_value))
         
         alert = 'NR'
         
         if threshold and st.alert_days_active:
-            if (value >= threshold.treshold_ft_max or value <= threshold.treshold_ft_min) and st.fault_user_active:
+            if (value >= threshold.threshold_ft_max or value <= threshold.threshold_ft_min) and st.fault_user_active:
                 alert = 'FT'
                 createLog(alert, alert_type, string_number, value)
-            elif (value >= threshold.treshold_wa_max or value <= threshold.treshold_wa_min) and st.warning_user_active:
+            elif (value >= threshold.threshold_wa_max or value <= threshold.threshold_wa_min) and st.warning_user_active:
                 alert = 'WA'
                 createLog(alert, alert_type, string_number, value)
             else:

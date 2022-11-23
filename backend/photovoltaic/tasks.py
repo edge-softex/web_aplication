@@ -17,7 +17,7 @@ from api import settings
 
 from .util import read_dat_file, stringify_datetime, timestamp_aware, alert_definition
 
-from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertTreshold, Settings, Log, AIAlgorithm
+from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertThreshold, Settings, Log, AIAlgorithm
 from photovoltaic.serializers import PVDataSerializer
 
 from api.wsgi import registry
@@ -126,7 +126,7 @@ def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
 
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
-def calculate_alerts_tresholds(self):
+def calculate_alerts_thresholds(self):
     """Calculates the thresholds used to activate alerts."""
 
     now = timestamp_aware()
@@ -178,11 +178,11 @@ def calculate_alerts_tresholds(self):
                 if(len(current_data[string_number]) > 0):
                     th = np.percentile(current_data[string_number], [fault_cr, 100-fault_cr, warning_cr, 100-warning_cr])
                     
-                    alert_th, created = AlertTreshold.objects.get_or_create(alert_type='CR', string_number=string_number+1, meteorological_value=value)
-                    alert_th.treshold_ft_max = th[0]
-                    alert_th.treshold_ft_min = th[1]
-                    alert_th.treshold_wa_max = th[2]
-                    alert_th.treshold_wa_min = th[3]
+                    alert_th, created = AlertThreshold.objects.get_or_create(alert_type='CR', string_number=string_number+1, meteorological_value=value)
+                    alert_th.threshold_ft_max = th[0]
+                    alert_th.threshold_ft_min = th[1]
+                    alert_th.threshold_wa_max = th[2]
+                    alert_th.threshold_wa_min = th[3]
                     alert_th.save()
 
         for value in range(min_temp, max_temp+1):
@@ -199,11 +199,11 @@ def calculate_alerts_tresholds(self):
                 if(len(voltage_data[string_number]) > 0):
                     th = np.percentile(voltage_data[string_number], [fault_vt, 100-fault_vt, warning_vt, 100-warning_vt])
 
-                    alert_th, created = AlertTreshold.objects.get_or_create(alert_type='VT', string_number=string_number+1, meteorological_value=value)
-                    alert_th.treshold_ft_max = th[0]
-                    alert_th.treshold_ft_min = th[1]
-                    alert_th.treshold_wa_max = th[2]
-                    alert_th.treshold_wa_min = th[3]
+                    alert_th, created = AlertThreshold.objects.get_or_create(alert_type='VT', string_number=string_number+1, meteorological_value=value)
+                    alert_th.threshold_ft_max = th[0]
+                    alert_th.threshold_ft_min = th[1]
+                    alert_th.threshold_wa_max = th[2]
+                    alert_th.threshold_wa_min = th[3]
                     alert_th.save()
 
         st.alert_days_active = True

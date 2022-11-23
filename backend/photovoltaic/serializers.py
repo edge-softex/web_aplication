@@ -12,7 +12,7 @@ from .models import (
     YieldMonth,
     YieldYear,
     YieldMinute,
-    AlertTreshold,
+    AlertThreshold,
     Settings,
     Log,
     AIAlgorithm
@@ -70,10 +70,10 @@ class YieldMinuteSerializer(serializers.ModelSerializer):
         model = YieldMinute
         fields = ['timestamp', 'yield_minute', 'yield_day_forecast']
 
-class AlertTresholdSerializer(serializers.ModelSerializer):
+class AlertThresholdSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AlertTreshold
-        fields = ['id', 'alert_type', 'string_number', 'meteorological_value', 'treshold_wa_max', 'treshold_wa_min', 'treshold_ft_max', 'treshold_ft_min']
+        model = AlertThreshold
+        fields = ['id', 'alert_type', 'string_number', 'meteorological_value', 'threshold_wa_max', 'threshold_wa_min', 'threshold_ft_max', 'threshold_ft_min']
 
 class SettingaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -83,10 +83,10 @@ class SettingaSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     """
-    This serializer defines two fields for authentication:
-      * username
-      * password.
-    It will try to authenticate the user with when validated.
+        This serializer defines two fields for authentication:
+        * username
+        * password.
+        It will try to authenticate the user with when validated.
     """
     username = serializers.CharField(
         label="Username",

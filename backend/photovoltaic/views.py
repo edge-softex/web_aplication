@@ -37,7 +37,7 @@ from .serializers import (
     YieldMonthSerializer,
     YieldYearSerializer,
     YieldMinuteSerializer,
-    AlertTresholdSerializer,
+    AlertThresholdSerializer,
     SettingaSerializer,
     LogSerializer)
 
@@ -49,7 +49,7 @@ from .models import (
     YieldMonth,
     YieldYear,
     YieldMinute,
-    AlertTreshold,
+    AlertThreshold,
     Settings,
     Log)
 
@@ -739,10 +739,10 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
 
         return Response(YieldMinuteSerializer(yield_data, many=True).data)
 
-class AlertTresholdViewSet(viewsets.ModelViewSet):
+class AlertThresholdViewSet(viewsets.ModelViewSet):
 
-    queryset = AlertTreshold.objects.all()
-    serializer_class = AlertTresholdSerializer
+    queryset = AlertThreshold.objects.all()
+    serializer_class = AlertThresholdSerializer
     pagination_class = DynamicPagination
 
 class SettingsViewSet(viewsets.ModelViewSet):
