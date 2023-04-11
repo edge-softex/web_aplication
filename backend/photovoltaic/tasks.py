@@ -218,87 +218,91 @@ def set_data(self, request_data):
     tupe request_data: json
     """
 
-    pass
+    strings_ref = []
 
-    # strings_ref = []
+    data_timestamp = request_data['timestamp']
+    data_time = datetime.strptime(request_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
 
-    # data_timestamp = request_data['timestamp']
-    # data_time = datetime.strptime(request_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
+    if(data_time.microsecond == 0):
+        data_time = data_time + timedelta(milliseconds=0.001)
 
-    # if(data_time.microsecond == 0):
-    #     data_time = data_time + timedelta(milliseconds=0.001)
+    if request_data['temperature_pv'] is not None:
+        temperature = request_data['temperature_pv']
+    elif request_data['temperature_amb'] is not None:
+        temperature = request_data['temperature_amb']
+    else:
+        temperature = 0
 
-    # if request_data['temperature_pv'] is not None:
-    #     temperature = request_data['temperature_pv']
-    # elif request_data['temperature_amb'] is not None:
-    #     temperature = request_data['temperature_amb']
-    # else:
-    #     temperature = 0
+    if request_data['irradiance'] is not None:
+        irradiance = request_data['irradiance']
+    else:
+        irradiance = 0 
 
-    # if request_data['irradiance'] is not None:
-    #     irradiance = request_data['irradiance']
-    # else:
-    #     irradiance = 0 
+    for string in request_data['strings']:
+        if string['power'] is None and string['voltage'] is not None and string['current'] is not None:
+            string_power = string['voltage'] * string['current']
+        else:
+            string_power = string['power']
+        string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
+                                timestamp=stringify_datetime(data_time),
+                                voltage=string['voltage'],
+                                current=string['current'],
+                                power=string_power,
+                                voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
+                                current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
+                                string_number=string['string_number'])
+        strings_ref.append(string_obj)
 
-    # for string in request_data['strings']:
-    #     if string['power'] is None and string['voltage'] is not None and string['current'] is not None:
-    #         string_power = string['voltage'] * string['current']
-    #     else:
-    #         string_power = string['power']
-    #     string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
-    #                             timestamp=stringify_datetime(data_time),
-    #                             voltage=string['voltage'],
-    #                             current=string['current'],
-    #                             power=string_power,
-    #                             voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
-    #                             current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
-    #                             string_number=string['string_number'])
-    #     strings_ref.append(string_obj)
+    data = PVData.objects.create(timestamp=stringify_datetime(data_time),
+                                irradiance=request_data['irradiance'],
+                                temperature_pv=request_data['temperature_pv'],
+                                temperature_amb=request_data['temperature_amb'],
+                                humidity=request_data['humidity'],
+                                wind_speed=request_data['wind_speed'],
+                                wind_direction=request_data['wind_direction'],
+                                rain=request_data['rain'],
+                                open_circuit_voltage=request_data['ocv'],
+                                short_circuit_current=request_data['scc'])
 
-    # data = PVData.objects.create(timestamp=stringify_datetime(data_time),
-    #                             irradiance=request_data['irradiance'],
-    #                             temperature_pv=request_data['temperature_pv'],
-    #                             temperature_amb=request_data['temperature_amb'])
+    data.strings.set(strings_ref)
 
-    # data.strings.set(strings_ref)
+    day = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', data_timestamp)
+    yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
 
-    # day = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', data_timestamp)
-    # yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
+    if request_data['generation'] is None and request_data['power_avr'] is None:
+        power = 0
+        energy = 0
+    elif request_data['generation'] is None and request_data['power_avr'] is not None:
+        power = request_data['power_avr']
+        energy = request_data['power_avr']*(1/60)/1000
+    elif request_data['generation'] is not None and request_data['power_avr'] is None:
+        energy = request_data['generation'] - yield_day.yield_day
+        power = energy*60*1000
+    else:
+        power = request_data['power_avr']
+        energy = request_data['generation'] - yield_day.yield_day
 
-    # if request_data['generation'] is None and request_data['power_avr'] is None:
-    #     power = 0
-    #     energy = 0
-    # elif request_data['generation'] is None and request_data['power_avr'] is not None:
-    #     power = request_data['power_avr']
-    #     energy = request_data['power_avr']*(1/60)/1000
-    # elif request_data['generation'] is not None and request_data['power_avr'] is None:
-    #     energy = request_data['generation'] - yield_day.yield_day
-    #     power = energy*60*1000
-    # else:
-    #     power = request_data['power_avr']
-    #     energy = request_data['generation'] - yield_day.yield_day
+    data.power_avg = power
+    data.save()
 
-    # data.power_avg = power
-    # data.save()
+    yield_day.yield_day = yield_day.yield_day + energy #kWh
+    yield_day.yield_day_forecaste = 30 #TODO run generation forecast
+    yield_day.save()
 
-    # yield_day.yield_day = yield_day.yield_day + energy #kWh
-    # yield_day.yield_day_forecaste = 30 #TODO run generation forecast
-    # yield_day.save()
+    yield_minute, created = YieldMinute.objects.get_or_create(timestamp=data_timestamp)
+    yield_minute.yield_minute = yield_day.yield_day #kWh
+    yield_minute.yield_day_forecaste = 30 #TODO run generation forecast
+    yield_minute.save()
 
-    # yield_minute, created = YieldMinute.objects.get_or_create(timestamp=data_timestamp)
-    # yield_minute.yield_minute = yield_day.yield_day #kWh
-    # yield_minute.yield_day_forecaste = 30 #TODO run generation forecast
-    # yield_minute.save()
+    month = re.sub(r'\d\dT\d\d:\d\d:\d\d.\d+', '01T00:00:00.000000', data_timestamp)
+    yield_month, created = YieldMonth.objects.get_or_create(timestamp=month)
+    yield_month.yield_month = yield_month.yield_month + energy #kWh
+    yield_month.save()
 
-    # month = re.sub(r'\d\dT\d\d:\d\d:\d\d.\d+', '01T00:00:00.000000', data_timestamp)
-    # yield_month, created = YieldMonth.objects.get_or_create(timestamp=month)
-    # yield_month.yield_month = yield_month.yield_month + energy #kWh
-    # yield_month.save()
-
-    # year = re.sub(r'\d\d-\d\dT\d\d:\d\d:\d\d.\d+', '01-01T00:00:00.000000', data_timestamp)
-    # yield_year, created = YieldYear.objects.get_or_create(timestamp=year)
-    # yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
-    # yield_year.save()
+    year = re.sub(r'\d\d-\d\dT\d\d:\d\d:\d\d.\d+', '01-01T00:00:00.000000', data_timestamp)
+    yield_year, created = YieldYear.objects.get_or_create(timestamp=year)
+    yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
+    yield_year.save()
 
     # instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
 
