@@ -33,7 +33,8 @@ class PVDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PVData
-        fields = ['timestamp', 'irradiance', 'temperature_pv', 'temperature_amb', 'power_avg', 'strings']
+        fields = ['timestamp', 'irradiance', 'temperature_pv', 'temperature_amb', 'humidity', 'wind_speed', 'wind_direction', 'rain',
+                  'open_circuit_voltage', 'short_circuit_current', 'power_avg', 'strings']
 
 class PVDataMeteorologicalSerializer(serializers.ModelSerializer):
     class Meta:

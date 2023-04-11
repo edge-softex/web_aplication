@@ -7,6 +7,12 @@ class PVData(models.Model):
     irradiance = models.FloatField(default=0, null=True)
     temperature_pv = models.FloatField(default=0, null=True)
     temperature_amb = models.FloatField(default=0, null=True)
+    humidity = models.IntegerField(default=0, null=True)
+    wind_speed = models.FloatField(default=0, null=True)
+    wind_direction = models.TextField(default="", null=True)
+    rain = models.FloatField(default=0, null=True)
+    open_circuit_voltage = models.FloatField(default=0, null=True)
+    short_circuit_current = models.FloatField(default=0, null=True)
     power_avg = models.FloatField(default=0, null=True)
     strings = models.ManyToManyField(PVString)
 
