@@ -43,23 +43,23 @@ def simulate_input(self):
 
     df_row = df.iloc[[index]]
 
-    s1 = PVString.objects.create(name='S1 ' + datetime_string, 
-                                timestamp=datetime_now,
-                                voltage=df_row['Tensao_S1_Avg'],
-                                current=df_row['Corrente_S1_Avg'],
-                                power=df_row['Potencia_S1_Avg'],
-                                voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
-                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
-                                string_number=1)
+    # s1 = PVString.objects.create(name='S1 ' + datetime_string, 
+    #                             timestamp=datetime_now,
+    #                             voltage=df_row['Tensao_S1_Avg'],
+    #                             current=df_row['Corrente_S1_Avg'],
+    #                             power=df_row['Potencia_S1_Avg'],
+    #                             voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
+    #                             current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
+    #                             string_number=1)
     
-    s2 = PVString.objects.create(name='S2 ' + datetime_string,
-                                timestamp=datetime_now,
-                                voltage=df_row['Tensao_S2_Avg'],
-                                current=df_row['Corrente_S2_Avg'],
-                                power=df_row['Potencia_S2_Avg'],
-                                voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
-                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
-                                string_number=2)
+    # s2 = PVString.objects.create(name='S2 ' + datetime_string,
+    #                             timestamp=datetime_now,
+    #                             voltage=df_row['Tensao_S2_Avg'],
+    #                             current=df_row['Corrente_S2_Avg'],
+    #                             power=df_row['Potencia_S2_Avg'],
+    #                             voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
+    #                             current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
+    #                             string_number=2)
 
     data = PVData.objects.create(timestamp=datetime_now,
                                 irradiance=df_row['Radiacao_Avg'],
@@ -67,7 +67,7 @@ def simulate_input(self):
                                 temperature_amb=df_row['Temp_Amb_Avg'],
                                 power_avg=df_row['Potencia_FV_Avg'])
 
-    data.strings.set([s1, s2])
+    # data.strings.set([s1, s2])
 
     energy = df_row['Potencia_FV_Avg']*(1/60)/1000
 
@@ -226,32 +226,32 @@ def set_data(self, request_data):
     if(data_time.microsecond == 0):
         data_time = data_time + timedelta(milliseconds=0.001)
 
-    if request_data['temperature_pv'] is not None:
-        temperature = request_data['temperature_pv']
-    elif request_data['temperature_amb'] is not None:
-        temperature = request_data['temperature_amb']
-    else:
-        temperature = 0
+    # if request_data['temperature_pv'] is not None:
+    #     temperature = request_data['temperature_pv']
+    # elif request_data['temperature_amb'] is not None:
+    #     temperature = request_data['temperature_amb']
+    # else:
+    #     temperature = 0
 
-    if request_data['irradiance'] is not None:
-        irradiance = request_data['irradiance']
-    else:
-        irradiance = 0 
+    # if request_data['irradiance'] is not None:
+    #     irradiance = request_data['irradiance']
+    # else:
+    #     irradiance = 0 
 
-    for string in request_data['strings']:
-        if string['power'] is None and string['voltage'] is not None and string['current'] is not None:
-            string_power = string['voltage'] * string['current']
-        else:
-            string_power = string['power']
-        string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
-                                timestamp=stringify_datetime(data_time),
-                                voltage=string['voltage'],
-                                current=string['current'],
-                                power=string_power,
-                                voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
-                                current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
-                                string_number=string['string_number'])
-        strings_ref.append(string_obj)
+    # for string in request_data['strings']:
+    #     if string['power'] is None and string['voltage'] is not None and string['current'] is not None:
+    #         string_power = string['voltage'] * string['current']
+    #     else:
+    #         string_power = string['power']
+    #     string_obj = PVString.objects.create(name='S' + str(string['string_number']) + ' ' + request_data['timestamp'], 
+    #                             timestamp=stringify_datetime(data_time),
+    #                             voltage=string['voltage'],
+    #                             current=string['current'],
+    #                             power=string_power,
+    #                             voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
+    #                             current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
+    #                             string_number=string['string_number'])
+    #     strings_ref.append(string_obj)
 
     data = PVData.objects.create(timestamp=stringify_datetime(data_time),
                                 irradiance=request_data['irradiance'],
@@ -264,7 +264,7 @@ def set_data(self, request_data):
                                 open_circuit_voltage=request_data['ocv'],
                                 short_circuit_current=request_data['scc'])
 
-    data.strings.set(strings_ref)
+    # data.strings.set(strings_ref)
 
     day = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', data_timestamp)
     yield_day, created = YieldDay.objects.get_or_create(timestamp=day)

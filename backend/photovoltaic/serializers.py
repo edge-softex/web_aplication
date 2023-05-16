@@ -29,12 +29,12 @@ class PVStringSerializer(serializers.ModelSerializer):
         fields = ['name', 'timestamp', 'voltage', 'current', 'power', 'voltage_alert', 'current_alert', 'string_number']
 
 class PVDataSerializer(serializers.ModelSerializer):
-    strings = PVStringSerializer(read_only=True, many=True)
+    # strings = PVStringSerializer(read_only=True, many=True)
 
     class Meta:
         model = PVData
         fields = ['timestamp', 'irradiance', 'temperature_pv', 'temperature_amb', 'humidity', 'wind_speed', 'wind_direction', 'rain',
-                  'open_circuit_voltage', 'short_circuit_current', 'power_avg', 'strings']
+                  'open_circuit_voltage', 'short_circuit_current', 'power_avg']
 
 class PVDataMeteorologicalSerializer(serializers.ModelSerializer):
     class Meta:

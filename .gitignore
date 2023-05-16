@@ -211,3 +211,4 @@ fabric.properties
 
 *.json
 *.pyc
+backend/docs/

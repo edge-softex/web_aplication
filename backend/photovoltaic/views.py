@@ -907,7 +907,6 @@ class ExternalAPIViweSet(viewsets.ViewSet):
             request_data['ocv']
             request_data['scc']
             request_data['power_avr']
-            request_data['strings']
             request_data['generation']
 
             set_data.apply_async(args=[request_data], kwargs={}, queue='input_data')

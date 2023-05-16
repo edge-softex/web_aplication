@@ -14,7 +14,6 @@ class PVData(models.Model):
     open_circuit_voltage = models.FloatField(default=0, null=True)
     short_circuit_current = models.FloatField(default=0, null=True)
     power_avg = models.FloatField(default=0, null=True)
-    strings = models.ManyToManyField(PVString)
 
     def __str__(self):
         return str(self.timestamp) + " " + str(self.irradiance) + " " + str(self.temperature_pv) + " " + str(self.temperature_amb) + " " + str(self.power_avg)
