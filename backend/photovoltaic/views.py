@@ -259,14 +259,15 @@ class PVDataViewSet(viewsets.ModelViewSet):
             status_string = 'Offline'
             status = 'offline'
         else:
-            for string in latest_data['strings']:
-                if string['voltage_alert'] == 'WA' or string['current_alert'] == 'WA':
-                    status_string = 'Warning'
-                    status = 'warning'
-                if string['voltage_alert'] == 'FT' or string['current_alert'] == 'FT':
-                    status_string = 'Fault'
-                    status = 'fault'
-                    break
+            # for string in latest_data['strings']:
+            #     if string['voltage_alert'] == 'WA' or string['current_alert'] == 'WA':
+            #         status_string = 'Warning'
+            #         status = 'warning'
+            #     if string['voltage_alert'] == 'FT' or string['current_alert'] == 'FT':
+            #         status_string = 'Fault'
+            #         status = 'fault'
+            #         break
+            pass
         
         json_response = {
             'status': status,
@@ -423,9 +424,37 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         if page is not None:
             serializer = PVDataSerializer(page, many=True).data
-            return Response(self.get_paginated_response(serializer).data)
+            data = self.get_paginated_response(serializer).data['results']
+        else:
+            data = PVDataSerializer(pv_data, many=True).data
 
-        return Response(PVDataSerializer(pv_data, many=True).data)
+        data_timestamp = [item['timestamp'].split('.')[0] for item in data]
+        data_irradiance = [item['irradiance'] for item in data]
+        data_temperature_pv = [item['temperature_pv'] for item in data]
+        data_temperature_amb = [item['temperature_amb'] for item in data]
+        data_humidity = [item['humidity'] for item in data]
+        data_wind_speed = [item['wind_speed'] for item in data]
+        data_wind_direction = [item['wind_direction'] for item in data]
+        data_rain = [item['rain'] for item in data]
+        data_ocv = [item['open_circuit_voltage'] for item in data]
+        data_scc = [item['short_circuit_current'] for item in data]
+        data_power_avg = [item['power_avg'] for item in data]
+
+        data_json = {
+            'timestamp': data_timestamp,
+            'irradiance': data_irradiance,
+            'temperature_pv': data_temperature_pv,
+            'temperature_amb': data_temperature_amb,
+            'humidity': data_humidity,
+            'wind_speed': data_wind_speed,
+            'wind_direction': data_wind_direction,
+            'rain': data_rain,
+            'open_circuit_voltage': data_ocv,
+            'short_circuit_current': data_scc,
+            'power_avg': data_power_avg
+        }
+
+        return Response(data_json)
 
 class PVStringViewSet(viewsets.ModelViewSet):
 

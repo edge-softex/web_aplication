@@ -5,6 +5,7 @@ import yieldReducer from './reducers/yieldDataSlice';
 import meteorologicalReducer from './reducers/meteorologicalDataSlice';
 import historyReducer from './reducers/historyDataSlice';
 import statusReducer from './reducers/statusDataSlice';
+import pvdataHistoryReducer from './reducers/pvdataHistoryDataSlice';
 
 export default configureStore({
   reducer: {
@@ -13,5 +14,6 @@ export default configureStore({
     meteorological: meteorologicalReducer,
     history: historyReducer,
     status: statusReducer,
+    pvdataHistory: pvdataHistoryReducer,
   },
 });
