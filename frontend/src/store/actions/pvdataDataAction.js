@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import axios from 'axios';
 import { API_URL, API_TOKEN } from '../../network';
-import { insertPvData, isLaodingPvData, isPvDataLoaded } from '../reducers/historyDataSlice';
+import { insertPvData, isLaodingPvData, isPvDataLoaded } from '../reducers/pvdataHistoryDataSlice';
 
 function getPvData() {
   const sessionURL = `${API_URL}/pvdata/history/`;

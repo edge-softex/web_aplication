@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import viewsets
 
+import csv
+from django.http import HttpResponse
+
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
 
@@ -15,13 +18,16 @@ from dateutil.relativedelta import relativedelta
 
 from api import settings
 
-from .util import (get_time_inteval,
+from .util import (
+    get_time_inteval,
     get_time_range,
     get_string_number,
     generate_forecast_json,
     timestamp_aware,
     stringify_datetime,
-    createLog)
+    createLog,
+    qs_to_local_csv
+    )
 
 from .tasks import set_data
 
@@ -419,7 +425,9 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         time_begin, time_end = get_time_range(request)
 
-        pv_data = PVData.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        pv_data = PVData.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end).order_by('-timestamp')
+        # qs_to_local_csv(pv_data, fields=["timestamp", "irradiance", "temperature_pv", "temperature_amb", "humidity", "wind_speed",
+        #                                  "wind_direction", "rain", "open_circuit_voltage", "short_circuit_current", "power_avg"])
         page = self.paginate_queryset(pv_data)
 
         if page is not None:
@@ -455,6 +463,28 @@ class PVDataViewSet(viewsets.ModelViewSet):
         }
 
         return Response(data_json)
+    
+    @action(methods=['GET'], url_path='downloadhistory', detail=False)
+    def download_history(self, request):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="pvdata.csv"'},
+        )
+
+        time_begin, time_end = get_time_range(request)
+
+        pv_data = PVData.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end).order_by('-timestamp')
+        serialized_data = PVDataSerializer(pv_data, many=True).data
+        fields = ["timestamp", "irradiance", "temperature_pv", "temperature_amb", "humidity", "wind_speed",
+                    "wind_direction", "rain", "open_circuit_voltage", "short_circuit_current", "power_avg"]
+
+        writer = csv.writer(response)
+        writer.writerow(fields)
+        for data_item in serialized_data:
+            print(data_item.values())
+            writer.writerow(data_item.values())
+
+        return response
 
 class PVStringViewSet(viewsets.ModelViewSet):
 

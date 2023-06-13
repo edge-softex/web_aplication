@@ -9,7 +9,7 @@ class PVData(models.Model):
     temperature_amb = models.FloatField(default=0, null=True)
     humidity = models.IntegerField(default=0, null=True)
     wind_speed = models.FloatField(default=0, null=True)
-    wind_direction = models.TextField(default="", null=True)
+    wind_direction = models.TextField(default="NONE", null=True)
     rain = models.FloatField(default=0, null=True)
     open_circuit_voltage = models.FloatField(default=0, null=True)
     short_circuit_current = models.FloatField(default=0, null=True)
