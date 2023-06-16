@@ -3,8 +3,8 @@ import axios from 'axios';
 import { API_URL, API_TOKEN } from '../../network';
 import { insertPvData, isLaodingPvData, isPvDataLoaded } from '../reducers/pvdataHistoryDataSlice';
 
-function getPvData() {
-  const sessionURL = `${API_URL}/pvdata/history/`;
+function getPvData(page) {
+  const sessionURL = `${API_URL}/pvdata/history/?page=${page}`;
 
   return async (dispatch) => {
     dispatch(isLaodingPvData(true));

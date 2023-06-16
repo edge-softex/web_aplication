@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import './Button.css';
 
 function Button(props) {
-  const { children, onclick } = props;
+  const { children, onClick } = props;
 
-  return <button type="button" className="Button_button-Button" onClick={onclick}>{children}</button>;
+  return <button type="button" className="Button_button-Button" onClick={onClick}>{children}</button>;
 }
 
 Button.propTypes = {
@@ -14,10 +14,7 @@ Button.propTypes = {
     PropTypes.string,
     PropTypes.object,
   ]).isRequired,
-  onclick: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.object,
-  ]).isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default Button;

@@ -1,11 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import LisOfSmallButtonsFooter from '../../Molecules/ListOfSmallButtonsFooter/LisOfSmallButtonsFooter';
 import DropDown from '../../atoms/DropDown/DropDown';
 
 import './FooterHistoric.css';
 
-function FooterHistoric() {
+function FooterHistoric(props) {
+  const { pages, setPage } = props;
+
+  const list = [];
+  for (let i = 1; i <= pages; i += 1) {
+    list.push(i);
+  }
+
+  // setPage(1);
+
   return (
     <div className="FooterHistoric_div-container">
       <div className="FooterHistoric_div-rightContent">
@@ -21,9 +31,14 @@ function FooterHistoric() {
         />
         <p className="FooterHistoric_p-rightContent">de 150 registros</p>
       </div>
-      <LisOfSmallButtonsFooter list={[1, 2, 3, 4, 5]} />
+      <LisOfSmallButtonsFooter list={list} setPage={setPage} />
     </div>
   );
 }
+
+FooterHistoric.propTypes = {
+  setPage: PropTypes.func.isRequired,
+  pages: PropTypes.number.isRequired,
+};
 
 export default FooterHistoric;

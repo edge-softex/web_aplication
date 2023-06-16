@@ -1,4 +1,5 @@
 import re
+import math
 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.authtoken.models import Token
@@ -25,8 +26,7 @@ from .util import (
     generate_forecast_json,
     timestamp_aware,
     stringify_datetime,
-    createLog,
-    qs_to_local_csv
+    createLog
     )
 
 from .tasks import set_data
@@ -432,7 +432,13 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         if page is not None:
             serializer = PVDataSerializer(page, many=True).data
-            data = self.get_paginated_response(serializer).data['results']
+            page = self.get_paginated_response(serializer).data
+
+            page_size = settings.PAGE_SIZE
+            
+            data = page['results']
+            pages = math.ceil(page['count']/page_size)
+            print(self.get_paginated_response(serializer).data)
         else:
             data = PVDataSerializer(pv_data, many=True).data
 
@@ -449,6 +455,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
         data_power_avg = [item['power_avg'] for item in data]
 
         data_json = {
+            'pages': pages,
             'timestamp': data_timestamp,
             'irradiance': data_irradiance,
             'temperature_pv': data_temperature_pv,

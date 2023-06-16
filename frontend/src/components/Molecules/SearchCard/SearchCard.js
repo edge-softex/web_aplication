@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import axios from 'axios';
 import { API_URL } from '../../../network';
-import getPvData from '../../../store/actions/pvdataDataAction';
 
 import Input from '../../atoms/Input/Input';
 import Button from '../../atoms/Button/Button';
@@ -24,26 +23,12 @@ function downloadFile() {
   });
 }
 
-function SearchCard() {
-  const pvData = useSelector((state) => state.pvdataHistory.pvData);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getPvData());
-  }, []);
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     dispatch(getPvData());
-  //     console.log(pvData);
-  //   }, 5000);
-  //   return () => clearInterval(interval);
-  // }, []);
-
+function SearchCard(props) {
+  const { pvData } = props;
   const rows = [];
   for (let i = 0; i < pvData.timestamp.length; i += 1) {
     rows.push(
-      <div className="list_div-element">
+      <div className="list_div-element" key={i}>
         <div className="element_div-content">{pvData.timestamp[i]}</div>
         <div className="element_div-content">{pvData.temperature_pv[i]}</div>
         <div className="element_div-content">{pvData.temperature_amb[i]}</div>
@@ -80,7 +65,7 @@ function SearchCard() {
             type="date"
           />
           <Button
-            onclick={() => downloadFile()}
+            onClick={() => downloadFile()}
           >
             {' '}
             <CloudSVG />
@@ -114,5 +99,22 @@ function SearchCard() {
     </div>
   );
 }
+
+SearchCard.propTypes = {
+  pvData: PropTypes.shape({
+    pages: PropTypes.number,
+    timestamp: PropTypes.arrayOf(PropTypes.string),
+    irradiance: PropTypes.arrayOf(PropTypes.number),
+    temperature_pv: PropTypes.arrayOf(PropTypes.number),
+    temperature_amb: PropTypes.arrayOf(PropTypes.number),
+    humidity: PropTypes.arrayOf(PropTypes.number),
+    wind_speed: PropTypes.arrayOf(PropTypes.number),
+    wind_direction: PropTypes.arrayOf(PropTypes.string),
+    rain: PropTypes.arrayOf(PropTypes.number),
+    open_circuit_voltage: PropTypes.arrayOf(PropTypes.number),
+    short_circuit_current: PropTypes.arrayOf(PropTypes.number),
+    power_avg: PropTypes.arrayOf(PropTypes.number),
+  }).isRequired,
+};
 
 export default SearchCard;
