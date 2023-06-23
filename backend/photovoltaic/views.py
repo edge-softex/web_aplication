@@ -438,7 +438,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
             
             data = page['results']
             pages = math.ceil(page['count']/page_size)
-            print(self.get_paginated_response(serializer).data)
+            # print(self.get_paginated_response(serializer).data)
         else:
             data = PVDataSerializer(pv_data, many=True).data
 
@@ -488,7 +488,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
         writer = csv.writer(response)
         writer.writerow(fields)
         for data_item in serialized_data:
-            print(data_item.values())
+            # print(data_item.values())
             writer.writerow(data_item.values())
 
         return response

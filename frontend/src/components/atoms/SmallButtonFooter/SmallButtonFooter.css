@@ -18,3 +18,8 @@
     background-color: #173C6C;
     color: #F8F9FA;
 }
+
+.SmallButtonFooter_button-contanier:disabled {
+    background-color: #3d6ba6;
+    color: #F8F9FA;
+}

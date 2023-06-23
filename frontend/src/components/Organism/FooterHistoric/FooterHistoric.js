@@ -9,11 +9,6 @@ import './FooterHistoric.css';
 function FooterHistoric(props) {
   const { pages, setPage } = props;
 
-  const list = [];
-  for (let i = 1; i <= pages; i += 1) {
-    list.push(i);
-  }
-
   // setPage(1);
 
   return (
@@ -31,7 +26,7 @@ function FooterHistoric(props) {
         />
         <p className="FooterHistoric_p-rightContent">de 150 registros</p>
       </div>
-      <LisOfSmallButtonsFooter list={list} setPage={setPage} />
+      <LisOfSmallButtonsFooter pages={pages} setPage={setPage} />
     </div>
   );
 }
