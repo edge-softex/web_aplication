@@ -226,3 +226,34 @@ def stringify_datetime(datetime):
     :return: stringify datetime
     """
     return str(datetime).replace(' ', 'T')
+ 
+def convert_ambient_temp_to_pv(amb_temp, irr):
+    """Converts ambient temperature to PV module temperature.
+    
+    param amb_temp: value of the ambient temperature
+    type amb_temp: float
+    param irr: value of the solar irradiance
+    type irr: float
+
+
+    :rtype: float
+    :return: PV module temperature
+    """
+    return amb_temp + (((45-20)/800) * irr)
+
+def get_estimated_power(irr, pv_module_temp):
+    """Estimates the instantante PV power from the values of solar irradiation and temperature of the photovoltaic module.
+    
+    param irr: value of the solar irradiance
+    type irr: float
+    param pv_module_temp: value of the the photovoltaic module temperature
+    type pv_module_temp: float
+
+
+    :rtype: float
+    :return: instantante PV power
+    """
+
+    nominal_power = 5000 # Ajustar para o valor da mini usina
+    return nominal_power * (irr/1000) * (1 - 0.0045*(pv_module_temp - 25)) * 0.90
+    

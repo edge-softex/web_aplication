@@ -146,6 +146,7 @@ task_routes = {'photovoltaic.tasks.simulate_model': {'queue': 'input_data'},
                 'photovoltaic.tasks.simulate_input': {'queue': 'input_data'},
                 'photovoltaic.tasks.set_data': {'queue': 'input_data'},
                 'photovoltaic.tasks.instant_power_forecast': {'queue': 'run_models'},
+                'photovoltaic.tasks.estimated_instant_power_forecast': {'queue': 'run_models'},
                 'photovoltaic.tasks.model_updating': {'queue': 'run_models'},
                 'photovoltaic.tasks.model_retraining': {'queue': 'training_model'}}
 
@@ -159,12 +160,12 @@ CELERY_BEAT_SCHEDULE = {
     #     'task': 'photovoltaic.tasks.simulate_input',
     #     'schedule':timedelta(minutes=1),
     #     'options': {'queue': 'input_data'}
-    # },
-    # 'ai_model_inference': {
-    #     'task': 'photovoltaic.tasks.instant_power_forecast',
-    #     'schedule':timedelta(minutes=1),
-    #     'options': {'queue': 'run_models'}
-    # }
+    #},
+    'ai_model_inference': {
+        'task': 'photovoltaic.tasks.estimated_instant_power_forecast',
+        'schedule':timedelta(minutes=1),
+        'options': {'queue': 'run_models'}
+    }
 }
 
 

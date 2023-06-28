@@ -15,9 +15,9 @@ import tensorflow as tf
 
 from api import settings
 
-from .util import read_dat_file, stringify_datetime, timestamp_aware, alert_definition
+from .util import read_dat_file, stringify_datetime, timestamp_aware, alert_definition, convert_ambient_temp_to_pv, get_estimated_power
 
-from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertThreshold, Settings, Log, AIAlgorithm
+from photovoltaic.models import PVData, PVString, PowerForecast, IrradianceForecast, AmbientTemperatureForecast, PVModuleTemperatureForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertThreshold, Settings, Log, AIAlgorithm
 from photovoltaic.serializers import PVDataSerializer
 
 from api.wsgi import registry
@@ -98,7 +98,8 @@ def simulate_input(self):
     power4 = float(df.iloc[[index+4]]['Potencia_FV_Avg'])
     power5 = float(df.iloc[[index+5]]['Potencia_FV_Avg'])
 
-    instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
+    #instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
+    estimated_instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
@@ -310,22 +311,7 @@ def set_data(self, request_data):
 def instant_power_forecast(self):
     """ Function that uses a neural network model to process 120 minutes of irradiance, temperature of the PV module and instant power data to forecasts 5 minute of instant power. Then saves it in the database.
     """
-
-
-    tz = timezone(settings.TIME_ZONE)
-    datetime_now = tz.localize(datetime.now())
     
-    datetime_gte = datetime_now - timedelta(minutes=120)
-    data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now)
-    irradiance = list(data.values_list('irradiance', flat=True))
-    temperature_pv = list(data.values_list('temperature_pv', flat=True))
-    power_avr = list(data.values_list('power_avg', flat=True))
-
-    input_data = irradiance+temperature_pv+power_avr
-
-    if len(input_data) != 360:
-        input_data = input_data + [0]*(360 - len(input_data)) 
-
     algs = AIAlgorithm.objects.filter(availability=True)
 
     alg_index = 0
@@ -334,7 +320,22 @@ def instant_power_forecast(self):
     
     if  algorithm_object.update == True:
         algorithm_object.update_model("lstm/model.h5")
-        
+
+    tz = timezone(settings.TIME_ZONE)
+    datetime_now = tz.localize(datetime.now())
+    
+    datetime_gte = datetime_now - timedelta(minutes=120)
+    data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now)
+    
+    irradiance = list(data.values_list('irradiance', flat=True))
+    temperature_pv = list(data.values_list('temperature_pv', flat=True))
+    power_avr = list(data.values_list('power_avg', flat=True))
+
+    input_data = irradiance+temperature_pv+power_avr
+
+    if len(input_data) != 360:
+        input_data = input_data + [0]*(360 - len(input_data)) 
+ 
     prediction = algorithm_object.compute_prediction(input_data)
  
     #Insert forecast into db
@@ -345,6 +346,52 @@ def instant_power_forecast(self):
                                     t3=p3,
                                     t4=p4,
                                     t5=p5)
+    
+@shared_task(bind=True, max_retries=3, on_failure=createLog)
+def estimated_instant_power_forecast(self):
+    """ Function that uses a neural network model to process 120 minutes of irradiance and ambient temperature to forecasts 5 minute of the same input features. Then uses this forecasts to estimate the next 5 minutes of PV instant power. Finally saves it in the database.
+    """
+    algs = AIAlgorithm.objects.filter(availability=True)
+
+    alg_index = 0
+    
+    algorithm_object = registry.algorithms[algs[alg_index].id]
+    
+    if  algorithm_object.update == True:
+        algorithm_object.update_model("lstm/model.h5")
+
+    tz = timezone(settings.TIME_ZONE)
+    datetime_now = tz.localize(datetime.now())
+    
+    datetime_gte = datetime_now - timedelta(minutes=120)
+    data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now)
+    
+    irradiance = list(data.values_list('irradiance', flat=True))
+    temperature_amb = list(data.values_list('temperature_amb', flat=True))
+    
+    input_data = irradiance+temperature_amb
+
+    required_input_lenght = len(algorithm_object.input_labels) * algorithm_object.input_steps
+    if len(input_data) != required_input_lenght:
+        input_data = input_data + [0]*(required_input_lenght - len(input_data)) 
+ 
+    prediction = algorithm_object.compute_prediction(input_data)
+        
+    irr = prediction[:,0]
+    amb_temp = prediction[:,1]
+
+    pv_temp = [convert_ambient_temp_to_pv(a, b) for a,b in zip(amb_temp,irr)]
+
+    instant_power = [get_estimated_power(a, b) for a,b in zip(irr, pv_temp)]
+    
+    p1, p2, p3, p4, p5 = instant_power
+
+    #Insert forecast into db
+    pf = PowerForecast.objects.create(timestamp=datetime_now, t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
+    irrf = IrradianceForecast.objects.create(timestamp=datetime_now, t1=irr[0], t2=irr[1], t3=irr[2], t4=irr[3], t5=irr[4])
+    ambtempf = AmbientTemperatureForecast.objects.create(timestamp=datetime_now, t1=amb_temp[0], t2=amb_temp[1], t3=amb_temp[2], t4=amb_temp[3], t5=amb_temp[4])
+    pvtempf = PVModuleTemperatureForecast.objects.create(timestamp=datetime_now, t1=pv_temp[0], t2=pv_temp[1], t3=pv_temp[2], t4=pv_temp[3], t5=pv_temp[4])
+
     
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def model_retraining(self):
@@ -358,7 +405,7 @@ def model_retraining(self):
     datetime_gte = datetime_now +relativedelta(months=-st.retraining_interval)
 
     df = pd.DataFrame.from_records(PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now).values())
-    print(df.columns)
+    
     algs = AIAlgorithm.objects.all()
     
     alg_index = 0

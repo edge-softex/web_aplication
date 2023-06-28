@@ -16,12 +16,12 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'api.settings')
 application = get_wsgi_application()
 
 # AI registry
-from photovoltaic.ai import (LstmPowerForecaster, AIRegistry)
+from photovoltaic.ai import (LstmForecaster, AIRegistry)
 
 try:
     registry = AIRegistry()
     
-    lstm = LstmPowerForecaster("lstm/model.h5")
+    lstm = LstmForecaster("lstm/model.h5")
     # add to AI registry
     registry.add_algorithm(algorithm_object=lstm,
                             algorithm_name="lstm power forecaster",

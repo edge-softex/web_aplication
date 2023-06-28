@@ -1,2 +1,2 @@
-from .lstm_power_forecaster import LstmPowerForecaster
+from .lstm_forecaster import LstmForecaster
 from .registry import AIRegistry
