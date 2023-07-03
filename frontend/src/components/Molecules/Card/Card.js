@@ -22,12 +22,20 @@ function Card(props) {
 
   let dataValue = null;
   if (showData) {
-    dataValue = <Consumption type="current" unity={unity}>{data.toFixed(2)}</Consumption>;
+    let printData = data;
+    if (data === null) {
+      printData = -1;
+    }
+    dataValue = <Consumption type="current" unity={unity}>{printData.toFixed(2)}</Consumption>;
   }
 
   let forecastValue = null;
   if (showForecast) {
-    forecastValue = <Consumption type="forecast" unity={unity}>{forecast.toFixed(2)}</Consumption>;
+    let printForecast = forecast;
+    if (forecast === null) {
+      printForecast = -1;
+    }
+    forecastValue = <Consumption type="forecast" unity={unity}>{printForecast.toFixed(2)}</Consumption>;
   }
 
   return (
