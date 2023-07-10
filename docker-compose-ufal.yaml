@@ -2,6 +2,7 @@ version: "3.2"
 services:
   pgsql:
     container_name: pgsql
+    restart: always
     image: postgres:12-alpine
     environment:
       POSTGRES_USER: softex_forecast
@@ -16,6 +17,7 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
+    restart: always
     image: rabbitmq:3-management
     ports:
       - "15672:15672"
@@ -30,6 +32,7 @@ services:
 
   backend:
     container_name: backend
+    restart: always
     command : bash -c "python manage.py migrate &&
                       python manage.py runserver 0.0.0.0:8000"
     build:
@@ -45,9 +48,10 @@ services:
 
   frontend:
     container_name: frontend
+    restart: always
     command : npm start
     environment:
-      - PUBLIC_URL="http://localhost:8000/api"
+      - PUBLIC_URL="http://172.20.8.27:8000/api"
     build:
       context: ./frontend/
       dockerfile: Dockerfile
@@ -61,6 +65,7 @@ services:
 
   worker:
     container_name: worker
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile-worker
@@ -74,6 +79,7 @@ services:
 
   trainer:
     container_name: trainer
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile-trainer
@@ -93,6 +99,7 @@ services:
 
   beat:
     container_name: beat
+    restart: always
     build: ./backend
     volumes:
       - ./backend:/app/backend
