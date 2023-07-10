@@ -614,7 +614,7 @@ class YieldDayViewSet(viewsets.ModelViewSet):
         datetime_lte = stringify_datetime(now)
         yesterday = now - timedelta(days=10)
         datetime_gte = stringify_datetime(yesterday)
-        yield_days = YieldDay.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        yield_days = YieldDay.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte).order_by('timestamp')
         yield_json = YieldDaySerializer(yield_days, many=True).data[-10: ]
 
         timestamp = [item['timestamp'].split('T')[0] for item in yield_json]
