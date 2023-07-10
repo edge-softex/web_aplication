@@ -352,11 +352,13 @@ class PVDataViewSet(viewsets.ModelViewSet):
         fc_timestamp = [item['timestamp'].split('.')[0] for item in forecast_json]
         forecast = [item['forecast'] for item in forecast_json]
 
-        if(power_timestamp):
-            if(power_timestamp[0] != fc_timestamp[0]):
+        if (power_timestamp and fc_timestamp):
+            if (power_timestamp[0] != fc_timestamp[0]):
                 fc_timestamp.insert(0, power_timestamp[0])
+        else:
+            print("-------- ERROR FORECAST LIST ------------")
 
-        if(len(fc_timestamp) > len(forecast)):
+        while (len(fc_timestamp) > len(forecast)):
             forecast.insert(0, 0)
 
         timestamp_list = []

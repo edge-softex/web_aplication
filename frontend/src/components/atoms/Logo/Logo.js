@@ -2,14 +2,25 @@ import React from 'react';
 
 import './Logo.css';
 
-import { ReactComponent as MainLogo } from '../../../assets/images/logo.svg';
+import Title from '../Title/Title';
+import MainLogo from '../../../assets/images/ufal.png';
 
 function Logo() {
   return (
-    <div>
-      <MainLogo
-        style={{ height: 46.6, width: 64 }}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <img
+        src={MainLogo}
+        alt="MainLogo"
+        width="79px"
+        height="100px"
       />
+      <Title>Miniusina Solar Fotovoltaca</Title>
     </div>
   );
 }
