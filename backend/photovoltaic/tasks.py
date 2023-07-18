@@ -20,7 +20,8 @@ from .util import read_dat_file, stringify_datetime, timestamp_aware, alert_defi
 from photovoltaic.models import PVData, PVString, PowerForecast, IrradianceForecast, AmbientTemperatureForecast, PVModuleTemperatureForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertThreshold, Settings, Log, AIAlgorithm
 from photovoltaic.serializers import PVDataSerializer
 
-from api.wsgi import registry
+#from api.wsgi import registry
+from api.wsgi import lstm
 
 import time
 
@@ -312,12 +313,13 @@ def instant_power_forecast(self):
     """ Function that uses a neural network model to process 120 minutes of irradiance, temperature of the PV module and instant power data to forecasts 5 minute of instant power. Then saves it in the database.
     """
     
-    algs = AIAlgorithm.objects.filter(availability=True)
+    #algs = AIAlgorithm.objects.filter(availability=True)
 
-    alg_index = 0
+    #alg_index = 0
     
-    algorithm_object = registry.algorithms[algs[alg_index].id]
-    
+    #algorithm_object = registry.algorithms[algs[alg_index].id]
+    algorithm_object = lstm
+
     if  algorithm_object.update == True:
         algorithm_object.update_model("lstm/model.h5")
 
@@ -351,13 +353,16 @@ def instant_power_forecast(self):
 def estimated_instant_power_forecast(self):
     """ Function that uses a neural network model to process 120 minutes of irradiance and ambient temperature to forecasts 5 minute of the same input features. Then uses this forecasts to estimate the next 5 minutes of PV instant power. Finally saves it in the database.
     """
-    algs = AIAlgorithm.objects.filter(availability=True)
+    #algs = AIAlgorithm.objects.filter(availability=True)
 
-    alg_index = 0
+    #alg_index = 0
     
-    algorithm_object = registry.algorithms[algs[alg_index].id]
-    
-    if  algorithm_object.update == True:
+    #algorithm_object = registry.algorithms[algs[alg_index].id]
+    algorithm_object = lstm
+
+    #if  algorithm_object.update == True:
+    if np.random.randint(2):
+        print("Updating model...")
         algorithm_object.update_model("lstm/model.h5")
 
     tz = timezone(settings.TIME_ZONE)
@@ -386,6 +391,8 @@ def estimated_instant_power_forecast(self):
     
     p1, p2, p3, p4, p5 = instant_power
 
+    print(f'Power predicted: {instant_power}')
+
     #Insert forecast into db
     pf = PowerForecast.objects.create(timestamp=datetime_now, t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
     irrf = IrradianceForecast.objects.create(timestamp=datetime_now, t1=irr[0], t2=irr[1], t3=irr[2], t4=irr[3], t5=irr[4])
@@ -406,13 +413,14 @@ def model_retraining(self):
 
     df = pd.DataFrame.from_records(PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now).values())
     
-    algs = AIAlgorithm.objects.all()
+    #algs = AIAlgorithm.objects.all()
     
-    alg_index = 0
+    #alg_index = 0
 
-    algorithm_object = registry.algorithms[algs[alg_index].id]
-    
-    if not df.empty:
+    #algorithm_object = registry.algorithms[algs[alg_index].id]
+    algorithm_object = lstm
+
+    if (not df.empty) and len(df) >= 43200:
         algorithm_object.retraining(df)
         model_updating.apply_async(args=[], kwargs={}, queue='run_models')
     else:
@@ -424,11 +432,12 @@ def model_retraining(self):
 def model_updating(self):
     """ Function that indicates that the neural network model needs to be updated in the "instant_power_forecast" task.
     """
-    algs = AIAlgorithm.objects.all()
+    #algs = AIAlgorithm.objects.all()
     
-    alg_index = 0
+    #alg_index = 0
 
-    algorithm_object = registry.algorithms[algs[alg_index].id]
-    
+    #algorithm_object = registry.algorithms[algs[alg_index].id]
+    algorithm_object = lstm
     algorithm_object.update = True
+    
 
