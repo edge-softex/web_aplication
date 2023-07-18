@@ -12,6 +12,7 @@ function getPowerData() {
 
     return axios.get(sessionURL, {
       headers: {
+        'ngrok-skip-browser-warning': 'true',
         Authorization: `Token ${API_TOKEN}`,
       },
     }).then(({ data }) => {

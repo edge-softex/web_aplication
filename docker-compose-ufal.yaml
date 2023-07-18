@@ -51,7 +51,7 @@ services:
     restart: always
     command : npm start
     environment:
-      - PUBLIC_URL="http://172.20.8.27:8000/api"
+      - PUBLIC_URL="https://96ce-200-17-112-81.ngrok-free.app/api"
     build:
       context: ./frontend/
       dockerfile: Dockerfile

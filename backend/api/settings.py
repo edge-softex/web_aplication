@@ -67,6 +67,16 @@ MIDDLEWARE = [
 #     'http://34.151.229.173:8000',
 # ]
 
+CORS_ALLOW_HEADERS = [
+    'ngrok-skip-browser-warning',
+    'Authorization'
+]
+
+CORS_EXPOSE_HEADERS = [
+    'ngrok-skip-browser-warning',
+    'Authorization'
+]
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'api.urls'
