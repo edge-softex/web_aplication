@@ -355,9 +355,6 @@ def estimated_instant_power_forecast(self):
 
     alg_index = 0
     
-    print("===================================================")
-    print(registry.algorithms)
-    print("===================================================")
     algorithm_object = registry.algorithms[algs[alg_index].id]
     
     if  algorithm_object.update == True:
