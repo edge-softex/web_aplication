@@ -17,7 +17,7 @@ function Menu() {
       <MenuElement
         exact
         link="/dashboard"
-        title="Dashboard"
+        title="Painel Principal"
       >
         <GraphSVG
           style={{ height: 25, width: 25 }}
@@ -25,7 +25,7 @@ function Menu() {
       </MenuElement>
       <MenuElement
         link="/history"
-        title="History"
+        title="Histórico"
       >
         <HistSVG
           style={{ height: 25, width: 25 }}
@@ -33,7 +33,7 @@ function Menu() {
       </MenuElement>
       <MenuElement
         link="/settings"
-        title="Settings"
+        title="Configurações"
       >
         <SettingsSVG
           style={{ height: 25, width: 25 }}

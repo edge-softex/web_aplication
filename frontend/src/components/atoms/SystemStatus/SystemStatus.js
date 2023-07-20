@@ -13,7 +13,7 @@ function SystemStatus(props) {
         <h3 className="systemstatus_h3">{statusString}</h3>
       </div>
       <div className="systemstatus_div-title">
-        <p className="systemstatus_p-title">Status system</p>
+        <p className="systemstatus_p-title">Estado do sistema</p>
       </div>
     </div>
   );

@@ -42,6 +42,7 @@ function BarChart(props) {
       {
         data: { data }.data,
         backgroundColor: '#173C6C',
+        label: 'Geração (Wh)',
       },
     ],
   };

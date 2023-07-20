@@ -22,7 +22,7 @@ function Historic() {
   return (
     <div className="historic-div">
       <div className="title_div-container">
-        <Title>History</Title>
+        <Title>Histórico de Dados</Title>
       </div>
       <SearchCard pvData={pvData} />
       <FooterHistoric

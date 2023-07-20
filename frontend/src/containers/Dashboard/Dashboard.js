@@ -41,14 +41,14 @@ function Dashboard() {
   return (
     <div className="dashboard-div">
       <div className="title_div-container">
-        <Title>Dashboard</Title>
+        <Title>Painel Principal</Title>
       </div>
       <div className="cards_div-container">
         <Card
           minWidth={400}
           width="35%"
           height={439}
-          title="Yield Today"
+          title="Geração Hoje"
           data={yieldData.data[yieldData.data.length - 1]}
           unity="Wh"
           showForecast={false}
@@ -63,7 +63,7 @@ function Dashboard() {
           minWidth={604}
           width="57%"
           height={439}
-          title="Yield History"
+          title="Histórico de Geração"
           showData={false}
           showForecast={false}
         >
@@ -76,7 +76,7 @@ function Dashboard() {
           minWidth={604}
           width="57%"
           height={439}
-          title="Instant Power"
+          title="Potência Instantânea"
           data={powerData.data[powerData.data.length - 6]}
           forecast={powerData.forecast[powerData.forecast.length - 6]}
           unity="W"
@@ -106,7 +106,7 @@ function Dashboard() {
           minWidth={400}
           width="35%"
           height={439}
-          title="Irradiance"
+          title="Irradiância Solar"
           data={meteorologicalData.irradiance[meteorologicalData.irradiance.length - 1]}
           unity="W/m²"
           showForecast={false}
@@ -121,7 +121,7 @@ function Dashboard() {
           minWidth={400}
           width="27.5%"
           height={439}
-          title="Pv cell temperature"
+          title="Temperatura do Módulo PV"
           data={meteorologicalData.temperature_pv[meteorologicalData.temperature_pv.length - 1]}
           unity="℃"
           showForecast={false}
@@ -132,7 +132,7 @@ function Dashboard() {
           minWidth={400}
           width="27.5%"
           height={439}
-          title="Abient temperature"
+          title="Temperatura Ambiente"
           data={meteorologicalData.temperature_amb[meteorologicalData.temperature_amb.length - 1]}
           unity="℃"
           showForecast={false}

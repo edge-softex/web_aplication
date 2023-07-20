@@ -48,13 +48,15 @@ function Card(props) {
       }}
     >
       <div className="card_div-head">
-        <div className="card_div-title">
-          <CardTitle>{title}</CardTitle>
-        </div>
+        <CardTitle>{title}</CardTitle>
         <div className="card_div-consumption">
           { dataValue }
           { forecastValue }
         </div>
+        {/* <div className="card_div-consumption">
+          { dataValue }
+          { forecastValue }
+        </div> */}
       </div>
       <div className="card_div-body">
         {children}

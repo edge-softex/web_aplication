@@ -72,31 +72,40 @@ const options = {
 function LineChart(props) {
   const { timestamp, data, forecast } = props;
 
-  let forecastDataSet = {};
+  let chartData = {};
 
-  if ({ forecast }.forecast) {
-    forecastDataSet = {
-      label: 'Forecast',
-      data: { forecast }.forecast,
-      borderColor: '#F7A159',
-      backgroundColor: '#F7A159',
-      borderWidth: 2,
+  const measuredDataSet = {
+    label: 'Medido',
+    data: { data }.data,
+    borderColor: '#173C6C',
+    backgroundColor: '#173C6C',
+    borderWidth: 2,
+  };
+
+  const forecastDataSet = {
+    label: 'Previsto',
+    data: { forecast }.forecast,
+    borderColor: '#F7A159',
+    backgroundColor: '#F7A159',
+    borderWidth: 2,
+  };
+
+  if (forecast.length > 0) {
+    chartData = {
+      labels: { timestamp }.timestamp,
+      datasets: [
+        measuredDataSet,
+        forecastDataSet,
+      ],
+    };
+  } else {
+    chartData = {
+      labels: { timestamp }.timestamp,
+      datasets: [
+        measuredDataSet,
+      ],
     };
   }
-
-  const chartData = {
-    labels: { timestamp }.timestamp,
-    datasets: [
-      {
-        label: 'Generated',
-        data: { data }.data,
-        borderColor: '#173C6C',
-        backgroundColor: '#173C6C',
-        borderWidth: 2,
-      },
-      forecastDataSet,
-    ],
-  };
 
   return (
     <Line options={options} data={chartData} />

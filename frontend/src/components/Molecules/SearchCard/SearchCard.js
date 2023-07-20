@@ -78,19 +78,19 @@ function SearchCard(props) {
         <div className="list_div-container">
           <div className="listtitle_div-element">
             <div className="elementtitle_div-content">
-              <p>Timestamp</p>
+              <p>Data/Hora</p>
             </div>
             <div className="elementtitle_div-content">
-              <p>PV Temperature</p>
+              <p>Temperatura PV</p>
             </div>
             <div className="elementtitle_div-content">
-              <p>Ambient temperature</p>
+              <p>Temperatura Ambiente</p>
             </div>
             <div className="elementtitle_div-content">
-              <p>Irrandiance</p>
+              <p>Irrandiância</p>
             </div>
             <div className="elementtitle_div-content">
-              <p>Power avr</p>
+              <p>Potência Média</p>
             </div>
           </div>
           {rows}

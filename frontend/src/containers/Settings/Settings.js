@@ -5,7 +5,7 @@ import './Settings.css';
 function Settings() {
   return (
     <div className="settings-div">
-      <h1>Settings</h1>
+      <h1>Configurações</h1>
     </div>
   );
 }
