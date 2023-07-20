@@ -27,5 +27,6 @@ try:
                             algorithm_name="lstm power forecaster",
                             algorithm_description="Lstm model with simple pre- and post-processing, capable of retraining",
                             algorithm_availability=True)
+    print("Registry created sucessfully!")
 except Exception as e:
     print("Exception while loading the algorithms to the registry,", str(e))

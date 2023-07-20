@@ -388,7 +388,6 @@ def estimated_instant_power_forecast(self):
     instant_power = [get_estimated_power(a, b) for a,b in zip(irr, pv_temp)]
     
     p1, p2, p3, p4, p5 = instant_power
-
     #Insert forecast into db
     pf = PowerForecast.objects.create(timestamp=datetime_now, t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
     irrf = IrradianceForecast.objects.create(timestamp=datetime_now, t1=irr[0], t2=irr[1], t3=irr[2], t4=irr[3], t5=irr[4])
