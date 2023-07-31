@@ -47,7 +47,7 @@ function LisOfSmallButtonsFooter(props) {
           }}
           key="begin"
         >
-          {'<-'}
+          {'<'}
         </SmallButtonFooter>
       )}
       {pageList.map((element) => (
@@ -70,7 +70,7 @@ function LisOfSmallButtonsFooter(props) {
           }}
           key="end"
         >
-          {'->'}
+          {'>'}
         </SmallButtonFooter>
       )}
     </div>

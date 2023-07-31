@@ -415,7 +415,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
         """Returns the PVData set between the given timestamps. By default it returns data for the last 24 hours.
 
         time_begin: initial datetime to filter the data, default is 24 hours less than the current datetime
-        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ)
+        type time_begin: str (yyyy-MM-ddTHH:mm:ss.SZ) ex.: 2023-07-30T11:12:53.0-03:00
         time_end: final datetime to filter the data, default is the current datetime
         type time_end: str (yyyy-MM-ddTHH:mm:ss.SZ)
         page: number of the page in which the data is separated, default is 1

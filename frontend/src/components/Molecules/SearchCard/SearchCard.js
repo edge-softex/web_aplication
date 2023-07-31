@@ -13,6 +13,13 @@ import { ReactComponent as CloudSVG } from '../../../assets/images/cloud.svg';
 
 const fileDownload = require('js-file-download');
 
+let defaultEndDate = new Date();
+defaultEndDate.setHours(defaultEndDate.getHours() - 3);
+let defaultInitDate = new Date(defaultEndDate.valueOf());
+defaultInitDate.setDate(defaultEndDate.getDate() - 1);
+[defaultInitDate] = defaultInitDate.toJSON().split('.');
+[defaultEndDate] = defaultEndDate.toJSON().split('.');
+
 function downloadFile() {
   axios({
     url: `${API_URL}/pvdata/downloadhistory/`,
@@ -24,7 +31,9 @@ function downloadFile() {
 }
 
 function SearchCard(props) {
-  const { pvData } = props;
+  const {
+    pvData, onBeginTimeChange, onEndTimeChange, setPage,
+  } = props;
   const rows = [];
   for (let i = 0; i < pvData.timestamp.length; i += 1) {
     rows.push(
@@ -44,9 +53,8 @@ function SearchCard(props) {
         <div className="head_div-left">
           <DropDown
             options={[
-              { value: 'teste1', name: 'nome1' },
-              { value: 'teste2', name: 'nome2' },
-              { value: 'teste3', name: 'nome3' },
+              { value: 'pvdata', name: 'Dados monitorados' },
+              { value: 'forecast', name: 'Previsão de geração' },
             ]}
             width="100%"
             height={48}
@@ -55,14 +63,28 @@ function SearchCard(props) {
         </div>
         <div className="head_div-right">
           <Input
-            title="Data e hora inicial"
+            title="Data e hora iniciais"
             width="30%"
-            type="date"
+            type="datetime-local"
+            placeholder="Data e Hora iniciais"
+            value={defaultInitDate}
+            onChange={(e) => {
+              onBeginTimeChange(`${e.target.value}.0-03:00`);
+              setPage(1);
+              defaultInitDate = e.target.value;
+            }}
           />
           <Input
-            title="Data e hora final"
+            title="Data e hora finais"
             width="30%"
-            type="date"
+            type="datetime-local"
+            placeholder="Data e hora finais"
+            value={defaultEndDate}
+            onChange={(e) => {
+              onEndTimeChange(`${e.target.value}.0-03:00`);
+              setPage(1);
+              defaultEndDate = e.target.value;
+            }}
           />
           <Button
             onClick={() => downloadFile()}
@@ -115,6 +137,9 @@ SearchCard.propTypes = {
     short_circuit_current: PropTypes.arrayOf(PropTypes.number),
     power_avg: PropTypes.arrayOf(PropTypes.number),
   }).isRequired,
+  onBeginTimeChange: PropTypes.func.isRequired,
+  onEndTimeChange: PropTypes.func.isRequired,
+  setPage: PropTypes.func.isRequired,
 };
 
 export default SearchCard;

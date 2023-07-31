@@ -13,18 +13,25 @@ import './Historic.css';
 function Historic() {
   const dispatch = useDispatch();
   const [actualPage, setActualPage] = useState(1);
+  const [beginTime, setBeginTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const pvData = useSelector((state) => state.pvdataHistory.pvData);
 
   useEffect(() => {
-    dispatch(getPvData(actualPage));
-  }, [actualPage]);
+    dispatch(getPvData(actualPage, beginTime, endTime));
+  }, [actualPage, beginTime, endTime]);
 
   return (
     <div className="historic-div">
       <div className="title_div-container">
         <Title>Histórico de Dados</Title>
       </div>
-      <SearchCard pvData={pvData} />
+      <SearchCard
+        pvData={pvData}
+        onBeginTimeChange={setBeginTime}
+        onEndTimeChange={setEndTime}
+        setPage={setActualPage}
+      />
       <FooterHistoric
         setPage={setActualPage}
         pages={pvData.pages}
