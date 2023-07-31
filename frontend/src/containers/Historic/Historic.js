@@ -35,6 +35,7 @@ function Historic() {
       <FooterHistoric
         setPage={setActualPage}
         pages={pvData.pages}
+        historyPage={actualPage}
       />
     </div>
   );

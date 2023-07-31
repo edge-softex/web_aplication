@@ -20,9 +20,12 @@ defaultInitDate.setDate(defaultEndDate.getDate() - 1);
 [defaultInitDate] = defaultInitDate.toJSON().split('.');
 [defaultEndDate] = defaultEndDate.toJSON().split('.');
 
+const downloadUrl = `${API_URL}/pvdata/downloadhistory/`;
+let downloadUrlFilter = downloadUrl;
+
 function downloadFile() {
   axios({
-    url: `${API_URL}/pvdata/downloadhistory/`,
+    url: downloadUrlFilter,
     method: 'GET',
     responseType: 'blob',
   }).then((response) => {
@@ -72,6 +75,7 @@ function SearchCard(props) {
               onBeginTimeChange(`${e.target.value}.0-03:00`);
               setPage(1);
               defaultInitDate = e.target.value;
+              downloadUrlFilter = `${downloadUrl}?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
             }}
           />
           <Input
@@ -84,6 +88,7 @@ function SearchCard(props) {
               onEndTimeChange(`${e.target.value}.0-03:00`);
               setPage(1);
               defaultEndDate = e.target.value;
+              downloadUrlFilter = `${downloadUrl}?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
             }}
           />
           <Button

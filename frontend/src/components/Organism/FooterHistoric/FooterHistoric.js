@@ -7,7 +7,7 @@ import DropDown from '../../atoms/DropDown/DropDown';
 import './FooterHistoric.css';
 
 function FooterHistoric(props) {
-  const { pages, setPage } = props;
+  const { pages, setPage, historyPage } = props;
 
   // setPage(1);
 
@@ -26,7 +26,7 @@ function FooterHistoric(props) {
         />
         <p className="FooterHistoric_p-rightContent">de 150 registros</p>
       </div>
-      <LisOfSmallButtonsFooter pages={pages} setPage={setPage} />
+      <LisOfSmallButtonsFooter pages={pages} setPage={setPage} historyPage={historyPage} />
     </div>
   );
 }
@@ -34,6 +34,7 @@ function FooterHistoric(props) {
 FooterHistoric.propTypes = {
   setPage: PropTypes.func.isRequired,
   pages: PropTypes.number.isRequired,
+  historyPage: PropTypes.number.isRequired,
 };
 
 export default FooterHistoric;

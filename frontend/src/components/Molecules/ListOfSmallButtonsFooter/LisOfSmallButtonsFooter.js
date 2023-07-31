@@ -6,11 +6,17 @@ import SmallButtonFooter from '../../atoms/SmallButtonFooter/SmallButtonFooter';
 import './LisOfSmallButtonsFooter.css';
 
 function LisOfSmallButtonsFooter(props) {
-  const { pages, setPage } = props;
+  const { pages, setPage, historyPage } = props;
   const [actualPage, setActualPage] = useState(1);
   const [pageList, setPageList] = useState([1]);
   const [showBeginButton, setShowBeginButton] = useState(false);
   const [showEndButton, setShowEndButton] = useState(false);
+
+  useEffect(() => {
+    if (historyPage !== actualPage) {
+      setActualPage(historyPage);
+    }
+  }, [historyPage]);
 
   useEffect(() => {
     let initPage = 1;
@@ -80,6 +86,7 @@ function LisOfSmallButtonsFooter(props) {
 LisOfSmallButtonsFooter.propTypes = {
   pages: PropTypes.number.isRequired,
   setPage: PropTypes.func.isRequired,
+  historyPage: PropTypes.number.isRequired,
 };
 
 export default LisOfSmallButtonsFooter;
