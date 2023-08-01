@@ -36,6 +36,8 @@ function Historic() {
         setPage={setActualPage}
         pages={pvData.pages}
         historyPage={actualPage}
+        elements={pvData.timestamp.length}
+        dataset={pvData.dataset}
       />
     </div>
   );

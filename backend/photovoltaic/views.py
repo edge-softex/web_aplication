@@ -458,6 +458,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         data_json = {
             'pages': pages,
+            'dataset': page['count'],
             'timestamp': data_timestamp,
             'irradiance': data_irradiance,
             'temperature_pv': data_temperature_pv,

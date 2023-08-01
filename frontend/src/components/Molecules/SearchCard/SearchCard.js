@@ -35,7 +35,10 @@ function downloadFile() {
 
 function SearchCard(props) {
   const {
-    pvData, onBeginTimeChange, onEndTimeChange, setPage,
+    pvData,
+    onBeginTimeChange,
+    onEndTimeChange,
+    setPage,
   } = props;
   const rows = [];
   for (let i = 0; i < pvData.timestamp.length; i += 1) {
