@@ -6,6 +6,7 @@ import meteorologicalReducer from './reducers/meteorologicalDataSlice';
 import historyReducer from './reducers/historyDataSlice';
 import statusReducer from './reducers/statusDataSlice';
 import pvdataHistoryReducer from './reducers/pvdataHistoryDataSlice';
+import forecastHistoryReducer from './reducers/forecastHistoryDataSlice';
 
 export default configureStore({
   reducer: {
@@ -15,5 +16,6 @@ export default configureStore({
     history: historyReducer,
     status: statusReducer,
     pvdataHistory: pvdataHistoryReducer,
+    forecastHistory: forecastHistoryReducer,
   },
 });

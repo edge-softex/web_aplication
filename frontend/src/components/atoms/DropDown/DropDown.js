@@ -5,7 +5,7 @@ import './DropDown.css';
 
 function DropDown(props) {
   const {
-    options, width, title, height,
+    options, width, title, height, onChange,
   } = props;
 
   return (
@@ -19,11 +19,13 @@ function DropDown(props) {
           height,
         }}
         className="select_dropdown"
+        onChange={onChange}
       >
         {options.map((option) => (
           <option
             value={option.value}
             className="option_dropdown"
+            key={option.value}
           >
             {option.name}
           </option>
@@ -47,6 +49,7 @@ DropDown.propTypes = {
     PropTypes.string,
   ]).isRequired,
   title: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default DropDown;

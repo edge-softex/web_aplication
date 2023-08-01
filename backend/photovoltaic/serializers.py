@@ -49,7 +49,7 @@ class PVDataPowerSerializer(serializers.ModelSerializer):
 class PowerForecastSerializer(serializers.ModelSerializer):
     class Meta:
         model = PowerForecast
-        fields = ['timestamp', 't1', 't2', 't3', 't4', 't5']
+        fields = ['timestamp', 'power_avg', 't1', 't2', 't3', 't4', 't5']
 
 class YieldDaySerializer(serializers.ModelSerializer):
     class Meta:

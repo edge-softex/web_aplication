@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import axios from 'axios';
@@ -36,21 +36,88 @@ function downloadFile() {
 function SearchCard(props) {
   const {
     pvData,
+    forecast,
     onBeginTimeChange,
     onEndTimeChange,
     setPage,
+    changeTable,
   } = props;
+  const [table, setTable] = useState('pvdata');
+
   const rows = [];
-  for (let i = 0; i < pvData.timestamp.length; i += 1) {
+
+  if (table === 'pvdata') {
     rows.push(
-      <div className="list_div-element" key={i}>
-        <div className="element_div-content">{pvData.timestamp[i]}</div>
-        <div className="element_div-content">{pvData.temperature_pv[i]}</div>
-        <div className="element_div-content">{pvData.temperature_amb[i]}</div>
-        <div className="element_div-content">{pvData.irradiance[i]}</div>
-        <div className="element_div-content">{pvData.power_avg[i]}</div>
+      <div className="listtitle_div-element">
+        <div className="elementtitle_div-content">
+          <p>Data/Hora</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Temperatura PV</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Temperatura Ambiente</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Irrandiância</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Potência Média</p>
+        </div>
       </div>,
     );
+
+    for (let i = 0; i < pvData.timestamp.length; i += 1) {
+      rows.push(
+        <div className="list_div-element" key={i}>
+          <div className="element_div-content">{pvData.timestamp[i]}</div>
+          <div className="element_div-content">{pvData.temperature_pv[i]}</div>
+          <div className="element_div-content">{pvData.temperature_amb[i]}</div>
+          <div className="element_div-content">{pvData.irradiance[i]}</div>
+          <div className="element_div-content">{pvData.power_avg[i]}</div>
+        </div>,
+      );
+    }
+  } else if (table === 'forecast') {
+    rows.push(
+      <div className="listtitle_div-element">
+        <div className="elementtitle_div-content">
+          <p>Data/Hora</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Pot. medida</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Prev. T+1m</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Prev. T+2m</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Prev. T+3m</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Prev. T+4m</p>
+        </div>
+        <div className="elementtitle_div-content">
+          <p>Prev. T+5m</p>
+        </div>
+      </div>,
+    );
+
+    for (let i = 0; i < forecast.timestamp.length; i += 1) {
+      rows.push(
+        <div className="list_div-element" key={i}>
+          <div className="element_div-content">{forecast.timestamp[i]}</div>
+          <div className="element_div-content">{forecast.power_avg[i]}</div>
+          <div className="element_div-content">{forecast.t1[i]}</div>
+          <div className="element_div-content">{forecast.t2[i]}</div>
+          <div className="element_div-content">{forecast.t3[i]}</div>
+          <div className="element_div-content">{forecast.t4[i]}</div>
+          <div className="element_div-content">{forecast.t5[i]}</div>
+        </div>,
+      );
+    }
   }
 
   return (
@@ -62,9 +129,14 @@ function SearchCard(props) {
               { value: 'pvdata', name: 'Dados monitorados' },
               { value: 'forecast', name: 'Previsão de geração' },
             ]}
-            width="100%"
+            width="80%"
             height={48}
             title="Escolher Tabela"
+            onChange={(e) => {
+              setTable(e.target.value);
+              changeTable(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
         <div className="head_div-right">
@@ -106,23 +178,6 @@ function SearchCard(props) {
       </div>
       <div className="searchcard_div-body">
         <div className="list_div-container">
-          <div className="listtitle_div-element">
-            <div className="elementtitle_div-content">
-              <p>Data/Hora</p>
-            </div>
-            <div className="elementtitle_div-content">
-              <p>Temperatura PV</p>
-            </div>
-            <div className="elementtitle_div-content">
-              <p>Temperatura Ambiente</p>
-            </div>
-            <div className="elementtitle_div-content">
-              <p>Irrandiância</p>
-            </div>
-            <div className="elementtitle_div-content">
-              <p>Potência Média</p>
-            </div>
-          </div>
           {rows}
         </div>
       </div>
@@ -133,6 +188,7 @@ function SearchCard(props) {
 SearchCard.propTypes = {
   pvData: PropTypes.shape({
     pages: PropTypes.number,
+    dataset: PropTypes.number,
     timestamp: PropTypes.arrayOf(PropTypes.string),
     irradiance: PropTypes.arrayOf(PropTypes.number),
     temperature_pv: PropTypes.arrayOf(PropTypes.number),
@@ -145,9 +201,21 @@ SearchCard.propTypes = {
     short_circuit_current: PropTypes.arrayOf(PropTypes.number),
     power_avg: PropTypes.arrayOf(PropTypes.number),
   }).isRequired,
+  forecast: PropTypes.shape({
+    pages: PropTypes.number,
+    dataset: PropTypes.number,
+    timestamp: PropTypes.arrayOf(PropTypes.string),
+    power_avg: PropTypes.arrayOf(PropTypes.number),
+    t1: PropTypes.arrayOf(PropTypes.number),
+    t2: PropTypes.arrayOf(PropTypes.number),
+    t3: PropTypes.arrayOf(PropTypes.number),
+    t4: PropTypes.arrayOf(PropTypes.number),
+    t5: PropTypes.arrayOf(PropTypes.number),
+  }).isRequired,
   onBeginTimeChange: PropTypes.func.isRequired,
   onEndTimeChange: PropTypes.func.isRequired,
   setPage: PropTypes.func.isRequired,
+  changeTable: PropTypes.func.isRequired,
 };
 
 export default SearchCard;

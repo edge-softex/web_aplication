@@ -327,7 +327,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
         """Returns the power data and power forecast of the last 24 hours (max 1440 datasets).
         
         :rtype: Response
-        :return: list of PVData (timestamp, power_avr)
+        :return: list of PVData (timestamp, power_avg)
         """
 
         time_interval = get_time_inteval(request)
@@ -443,6 +443,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
             # print(self.get_paginated_response(serializer).data)
         else:
             data = PVDataSerializer(pv_data, many=True).data
+            pages = 1
 
         data_timestamp = [item['timestamp'].split('.')[0] for item in data]
         data_irradiance = [item['irradiance'] for item in data]
@@ -577,14 +578,42 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
 
         time_begin, time_end = get_time_range(request)
 
-        forecast_data = PowerForecast.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
+        forecast_data = PowerForecast.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end).order_by('-timestamp')
         page = self.paginate_queryset(forecast_data)
 
         if page is not None:
             serializer = PowerForecastSerializer(page, many=True).data
-            return Response(self.get_paginated_response(serializer).data)
+            page = self.get_paginated_response(serializer).data
 
-        return Response(PowerForecastSerializer(forecast_data, many=True).data)
+            page_size = settings.PAGE_SIZE
+            
+            data = page['results']
+            pages = math.ceil(page['count']/page_size)
+        else:
+            data = PowerForecastSerializer(forecast_data, many=True).data
+            pages = 1
+
+        data_timestamp = [item['timestamp'].split('.')[0] for item in data]
+        power_avg = [round(item['power_avg'], 2) for item in data]
+        t1 = [round(item['t1'], 2) for item in data]
+        t2 = [round(item['t2'], 2) for item in data]
+        t3 = [round(item['t3'], 2) for item in data]
+        t4 = [round(item['t4'], 2) for item in data]
+        t5 = [round(item['t5'], 2) for item in data]
+
+        data_json = {
+            'pages': pages,
+            'dataset': page['count'],
+            'timestamp': data_timestamp,
+            'power_avg': power_avg,
+            't1': t1,
+            't2': t2,
+            't3': t3,
+            't4': t4,
+            't5': t5
+        }
+
+        return Response(data_json)
 
 class YieldDayViewSet(viewsets.ModelViewSet):
 
@@ -975,7 +1004,7 @@ class ExternalAPIViweSet(viewsets.ViewSet):
             request_data['rain']
             request_data['ocv']
             request_data['scc']
-            request_data['power_avr']
+            request_data['power_avg']
             request_data['generation']
 
             set_data.apply_async(args=[request_data], kwargs={}, queue='input_data')

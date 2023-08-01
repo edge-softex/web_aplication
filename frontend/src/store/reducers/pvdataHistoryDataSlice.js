@@ -5,6 +5,7 @@ export const pvdataHistorySlice = createSlice({
   initialState: {
     pvData: {
       pages: 1,
+      dataset: 0,
       timestamp: ['none'],
       irradiance: [0],
       temperature_pv: [0],

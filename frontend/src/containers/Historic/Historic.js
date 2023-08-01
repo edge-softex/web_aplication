@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import getPvData from '../../store/actions/pvdataDataAction';
+import getForecast from '../../store/actions/forecastDataAction';
 
 import Title from '../../components/atoms/Title/Title';
 import SearchCard from '../../components/Molecules/SearchCard/SearchCard';
@@ -15,11 +16,26 @@ function Historic() {
   const [actualPage, setActualPage] = useState(1);
   const [beginTime, setBeginTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [pages, setPages] = useState(1);
+  const [elements, setElements] = useState(1);
+  const [dataset, setDataset] = useState(1);
+  const [table, setTable] = useState('pvdata');
   const pvData = useSelector((state) => state.pvdataHistory.pvData);
+  const forecast = useSelector((state) => state.forecastHistory.forecast);
 
   useEffect(() => {
-    dispatch(getPvData(actualPage, beginTime, endTime));
-  }, [actualPage, beginTime, endTime]);
+    if (table === 'pvdata') {
+      dispatch(getPvData(actualPage, beginTime, endTime));
+      setPages(pvData.pages);
+      setElements(pvData.timestamp.length);
+      setDataset(pvData.dataset);
+    } else if ((table === 'forecast')) {
+      dispatch(getForecast(actualPage, beginTime, endTime));
+      setPages(forecast.pages);
+      setElements(forecast.timestamp.length);
+      setDataset(forecast.dataset);
+    }
+  }, [actualPage, beginTime, endTime, table]);
 
   return (
     <div className="historic-div">
@@ -28,16 +44,18 @@ function Historic() {
       </div>
       <SearchCard
         pvData={pvData}
+        forecast={forecast}
         onBeginTimeChange={setBeginTime}
         onEndTimeChange={setEndTime}
         setPage={setActualPage}
+        changeTable={setTable}
       />
       <FooterHistoric
         setPage={setActualPage}
-        pages={pvData.pages}
+        pages={pages}
         historyPage={actualPage}
-        elements={pvData.timestamp.length}
-        dataset={pvData.dataset}
+        elements={elements}
+        dataset={dataset}
       />
     </div>
   );

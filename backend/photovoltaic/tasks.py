@@ -92,11 +92,11 @@ def simulate_input(self):
     yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
     yield_year.save()
 
-    power1 = float(df.iloc[[index+1]]['Potencia_FV_Avg'])
-    power2 = float(df.iloc[[index+2]]['Potencia_FV_Avg'])
-    power3 = float(df.iloc[[index+3]]['Potencia_FV_Avg'])
-    power4 = float(df.iloc[[index+4]]['Potencia_FV_Avg'])
-    power5 = float(df.iloc[[index+5]]['Potencia_FV_Avg'])
+    # power1 = float(df.iloc[[index+1]]['Potencia_FV_Avg'])
+    # power2 = float(df.iloc[[index+2]]['Potencia_FV_Avg'])
+    # power3 = float(df.iloc[[index+3]]['Potencia_FV_Avg'])
+    # power4 = float(df.iloc[[index+4]]['Potencia_FV_Avg'])
+    # power5 = float(df.iloc[[index+5]]['Potencia_FV_Avg'])
 
     #instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
     estimated_instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
@@ -119,6 +119,7 @@ def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
     type power_5: float
     """
     pf = PowerForecast.objects.create(timestamp=datetime_now,
+                                    power_avg=power1,
                                     t1=power1 + random.uniform(0, 1.0),
                                     t2=power2 + random.uniform(0.3, 1.3),
                                     t3=power3 + random.uniform(0.6, 1.6),
@@ -270,17 +271,17 @@ def set_data(self, request_data):
     day = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', data_timestamp)
     yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
 
-    if request_data['generation'] is None and request_data['power_avr'] is None:
+    if request_data['generation'] is None and request_data['power_avg'] is None:
         power = 0
         energy = 0
-    elif request_data['generation'] is None and request_data['power_avr'] is not None:
-        power = request_data['power_avr']
-        energy = request_data['power_avr']*(1/60)/1000
-    elif request_data['generation'] is not None and request_data['power_avr'] is None:
+    elif request_data['generation'] is None and request_data['power_avg'] is not None:
+        power = request_data['power_avg']
+        energy = request_data['power_avg']*(1/60)/1000
+    elif request_data['generation'] is not None and request_data['power_avg'] is None:
         energy = request_data['generation'] - yield_day.yield_day
         power = energy*60*1000
     else:
-        power = request_data['power_avr']
+        power = request_data['power_avg']
         energy = request_data['generation'] - yield_day.yield_day
 
     data.power_avg = power
@@ -325,13 +326,14 @@ def instant_power_forecast(self):
     datetime_now = tz.localize(datetime.now())
     
     datetime_gte = datetime_now - timedelta(minutes=120)
-    data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now)
+    data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now).order_by('timestamp')
     
+    timestamp = list(data.values_list('timestamp', flat=True))
     irradiance = list(data.values_list('irradiance', flat=True))
     temperature_pv = list(data.values_list('temperature_pv', flat=True))
-    power_avr = list(data.values_list('power_avg', flat=True))
+    power_avg = list(data.values_list('power_avg', flat=True))
 
-    input_data = irradiance+temperature_pv+power_avr
+    input_data = irradiance+temperature_pv+power_avg
 
     if len(input_data) != 360:
         input_data = input_data + [0]*(360 - len(input_data)) 
@@ -340,7 +342,8 @@ def instant_power_forecast(self):
  
     #Insert forecast into db
     p1, p2, p3, p4, p5 = prediction
-    pf = PowerForecast.objects.create(timestamp=datetime_now,
+    pf = PowerForecast.objects.create(timestamp=timestamp[-1],
+                                    power_avg=power_avg[-1],
                                     t1=p1,
                                     t2=p2,
                                     t3=p3,
@@ -364,10 +367,12 @@ def estimated_instant_power_forecast(self):
     datetime_now = tz.localize(datetime.now())
     
     datetime_gte = datetime_now - timedelta(minutes=120)
-    data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now)
+    data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_now).order_by('timestamp')
     
+    timestamp = list(data.values_list('timestamp', flat=True))
     irradiance = list(data.values_list('irradiance', flat=True))
     temperature_amb = list(data.values_list('temperature_amb', flat=True))
+    power_avg = list(data.values_list('power_avg', flat=True))
     
     input_data = irradiance+temperature_amb
 
@@ -386,7 +391,7 @@ def estimated_instant_power_forecast(self):
     
     p1, p2, p3, p4, p5 = instant_power
     #Insert forecast into db
-    pf = PowerForecast.objects.create(timestamp=datetime_now, t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
+    pf = PowerForecast.objects.create(timestamp=timestamp[-1], power_avg=power_avg[-1], t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
     irrf = IrradianceForecast.objects.create(timestamp=datetime_now, t1=irr[0], t2=irr[1], t3=irr[2], t4=irr[3], t5=irr[4])
     ambtempf = AmbientTemperatureForecast.objects.create(timestamp=datetime_now, t1=amb_temp[0], t2=amb_temp[1], t3=amb_temp[2], t4=amb_temp[3], t5=amb_temp[4])
     pvtempf = PVModuleTemperatureForecast.objects.create(timestamp=datetime_now, t1=pv_temp[0], t2=pv_temp[1], t3=pv_temp[2], t4=pv_temp[3], t5=pv_temp[4])
