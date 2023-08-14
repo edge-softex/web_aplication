@@ -10,7 +10,8 @@ import Title from '../../components/atoms/Title/Title';
 import Card from '../../components/Molecules/Card/Card';
 import LineChart from '../../components/atoms/LineChart/LineChart';
 import BarChart from '../../components/atoms/BarChart/BarChart';
-import HalfDoughnutChart from '../../components/atoms/halfDoughnutChart/HalfDoughnutChart';
+import UnderConstruction from '../../components/atoms/UnderConstruction/UnderConstruction';
+// import HalfDoughnutChart from '../../components/atoms/halfDoughnutChart/HalfDoughnutChart';
 
 import './Dashboard.css';
 
@@ -57,6 +58,8 @@ function Dashboard() {
             timestamp={yieldData.timestamp}
             data={yieldData.data}
             forecast={[]}
+            label1="Wh"
+            label2=""
           />
         </Card>
         <Card
@@ -85,6 +88,8 @@ function Dashboard() {
             timestamp={powerData.timestamp}
             data={powerData.data}
             forecast={powerData.forecast}
+            label1="Medido (W)"
+            label2="Previsto (W)"
           />
         </Card>
         <Card
@@ -96,11 +101,7 @@ function Dashboard() {
           showData={false}
           showForecast={false}
         >
-          <LineChart
-            timestamp={[]}
-            data={[]}
-            forecast={[]}
-          />
+          <UnderConstruction />
         </Card>
         <Card
           minWidth={400}
@@ -115,6 +116,8 @@ function Dashboard() {
             timestamp={meteorologicalData.timestamp}
             data={meteorologicalData.irradiance}
             forecast={[]}
+            label1="W/m²"
+            label2=""
           />
         </Card>
         <Card
@@ -126,7 +129,13 @@ function Dashboard() {
           unity="℃"
           showForecast={false}
         >
-          <HalfDoughnutChart />
+          <LineChart
+            timestamp={meteorologicalData.timestamp}
+            data={meteorologicalData.temperature_pv}
+            forecast={[]}
+            label1="℃"
+            label2=""
+          />
         </Card>
         <Card
           minWidth={400}
@@ -137,7 +146,13 @@ function Dashboard() {
           unity="℃"
           showForecast={false}
         >
-          <HalfDoughnutChart />
+          <LineChart
+            timestamp={meteorologicalData.timestamp}
+            data={meteorologicalData.temperature_amb}
+            forecast={[]}
+            label1="℃"
+            label2=""
+          />
         </Card>
       </div>
     </div>

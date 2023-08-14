@@ -70,12 +70,14 @@ const options = {
 };
 
 function LineChart(props) {
-  const { timestamp, data, forecast } = props;
+  const {
+    timestamp, data, forecast, label1, label2,
+  } = props;
 
   let chartData = {};
 
   const measuredDataSet = {
-    label: 'Medido',
+    label: label1,
     data: { data }.data,
     borderColor: '#173C6C',
     backgroundColor: '#173C6C',
@@ -83,7 +85,7 @@ function LineChart(props) {
   };
 
   const forecastDataSet = {
-    label: 'Previsto',
+    label: label2,
     data: { forecast }.forecast,
     borderColor: '#F7A159',
     backgroundColor: '#F7A159',
@@ -116,6 +118,8 @@ LineChart.propTypes = {
   timestamp: PropTypes.arrayOf(string).isRequired,
   data: PropTypes.arrayOf(number).isRequired,
   forecast: PropTypes.arrayOf(number).isRequired,
+  label1: PropTypes.string.isRequired,
+  label2: PropTypes.string.isRequired,
 };
 
 export default LineChart;

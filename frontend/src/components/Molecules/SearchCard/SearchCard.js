@@ -159,6 +159,7 @@ function SearchCard(props) {
             type="datetime-local"
             placeholder="Data e Hora iniciais"
             value={defaultInitDate}
+            required
             onChange={(e) => {
               onBeginTimeChange(`${e.target.value}.0-03:00`);
               setPage(1);
@@ -172,6 +173,7 @@ function SearchCard(props) {
             type="datetime-local"
             placeholder="Data e hora finais"
             value={defaultEndDate}
+            required
             onChange={(e) => {
               onEndTimeChange(`${e.target.value}.0-03:00`);
               setPage(1);

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import getStatusData from '../../../store/actions/statusDataAction';
 
 import SystemStatus from '../../atoms/SystemStatus/SystemStatus';
-import UserAvatar from '../../atoms/userAvatar/UserAvatar';
+// import UserAvatar from '../../atoms/userAvatar/UserAvatar';
 
 import './NavigationItems.css';
 
@@ -31,9 +31,9 @@ function NavigationItems() {
           statusString={statusData.status_string}
         />
       </li>
-      <li>
+      {/* <li>
         <UserAvatar name="Vinicius Feitosa" />
-      </li>
+      </li> */}
     </ul>
   );
 }

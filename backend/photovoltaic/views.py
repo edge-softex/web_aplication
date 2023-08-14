@@ -308,7 +308,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         meteorological_data = PVDataMeteorologicalSerializer(day_data, many=True).data
 
-        timestamp = [item['timestamp'].split('.')[0] for item in meteorological_data]
+        timestamp = [item['timestamp'].split('.')[0].split('T')[1] for item in meteorological_data]
         irradiance = [item['irradiance'] for item in meteorological_data]
         temperature_pv = [item['temperature_pv'] for item in meteorological_data]
         temperature_amb = [item['temperature_amb'] for item in meteorological_data]
@@ -390,8 +390,10 @@ class PVDataViewSet(viewsets.ModelViewSet):
                     aux_forecast[i] = forecast[j]
                     break
 
-        for time in timestamp_list:
-            time = stringify_datetime(time).split('.')[0]
+        # for time in timestamp_list:
+        #     time = stringify_datetime(time).split('.')[0].split('T')[1]
+
+        timestamp_list = [stringify_datetime(time).split('.')[0].split('T')[1] for time in timestamp_list]
 
         if not timestamp_list:
             timestamp_list = ['None', 'None', 'None', 'None', 'None', 'None']
@@ -822,7 +824,7 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         yield_today = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
         yield_json = YieldMinuteSerializer(yield_today, many=True).data
 
-        timestamp = [item['timestamp'].split('.')[0] for item in yield_json]
+        timestamp = [item['timestamp'].split('.')[0].split('T')[1] for item in yield_json]
         yield_minute = [item['yield_minute'] for item in yield_json]
 
         data_json = {
