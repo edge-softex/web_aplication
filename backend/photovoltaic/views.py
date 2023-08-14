@@ -614,6 +614,27 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
         }
 
         return Response(data_json)
+    
+    @action(methods=['GET'], url_path='downloadhistory', detail=False)
+    def download_history(self, request):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="pvdata.csv"'},
+        )
+
+        time_begin, time_end = get_time_range(request)
+
+        forecast_data = PowerForecast.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end).order_by('-timestamp')
+        serialized_data = PowerForecastSerializer(forecast_data, many=True).data
+        fields = ["timestamp", "power_avg", "t1", "t2", "t3", "t4", "t5"]
+
+        writer = csv.writer(response)
+        writer.writerow(fields)
+        for data_item in serialized_data:
+            # print(data_item.values())
+            writer.writerow(data_item.values())
+
+        return response
 
 class YieldDayViewSet(viewsets.ModelViewSet):
 

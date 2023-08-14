@@ -26,16 +26,22 @@ function Historic() {
   useEffect(() => {
     if (table === 'pvdata') {
       dispatch(getPvData(actualPage, beginTime, endTime));
+    } else if ((table === 'forecast')) {
+      dispatch(getForecast(actualPage, beginTime, endTime));
+    }
+  }, [actualPage, beginTime, endTime, table]);
+
+  useEffect(() => {
+    if (table === 'pvdata') {
       setPages(pvData.pages);
       setElements(pvData.timestamp.length);
       setDataset(pvData.dataset);
     } else if ((table === 'forecast')) {
-      dispatch(getForecast(actualPage, beginTime, endTime));
       setPages(forecast.pages);
       setElements(forecast.timestamp.length);
       setDataset(forecast.dataset);
     }
-  }, [actualPage, beginTime, endTime, table]);
+  }, [pvData, forecast, table]);
 
   return (
     <div className="historic-div">

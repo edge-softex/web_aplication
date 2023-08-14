@@ -20,17 +20,29 @@ defaultInitDate.setDate(defaultEndDate.getDate() - 1);
 [defaultInitDate] = defaultInitDate.toJSON().split('.');
 [defaultEndDate] = defaultEndDate.toJSON().split('.');
 
-const downloadUrl = `${API_URL}/pvdata/downloadhistory/`;
-let downloadUrlFilter = downloadUrl;
+let downloadUrl = `${API_URL}/pvdata/downloadhistory/`;
+let downloadFilter = '';
+let fileName = 'pvdata.csv';
 
 function downloadFile() {
   axios({
-    url: downloadUrlFilter,
+    url: `${downloadUrl}${downloadFilter}`,
     method: 'GET',
     responseType: 'blob',
   }).then((response) => {
-    fileDownload(response.data, 'pvdata.csv');
+    fileDownload(response.data, fileName);
   });
+}
+
+function setDownloadURL(table) {
+  if (table === 'pvdata') {
+    downloadUrl = `${API_URL}/pvdata/downloadhistory/`;
+    fileName = 'pvdata.csv';
+  }
+  if (table === 'forecast') {
+    downloadUrl = `${API_URL}/powerforecast/downloadhistory/`;
+    fileName = 'pvforecast.csv';
+  }
 }
 
 function SearchCard(props) {
@@ -136,6 +148,7 @@ function SearchCard(props) {
               setTable(e.target.value);
               changeTable(e.target.value);
               setPage(1);
+              setDownloadURL(e.target.value);
             }}
           />
         </div>
@@ -150,7 +163,7 @@ function SearchCard(props) {
               onBeginTimeChange(`${e.target.value}.0-03:00`);
               setPage(1);
               defaultInitDate = e.target.value;
-              downloadUrlFilter = `${downloadUrl}?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
+              downloadFilter = `?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
             }}
           />
           <Input
@@ -163,7 +176,7 @@ function SearchCard(props) {
               onEndTimeChange(`${e.target.value}.0-03:00`);
               setPage(1);
               defaultEndDate = e.target.value;
-              downloadUrlFilter = `${downloadUrl}?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
+              downloadFilter = `?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
             }}
           />
           <Button
