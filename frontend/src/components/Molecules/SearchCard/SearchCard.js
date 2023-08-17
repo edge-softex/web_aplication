@@ -24,6 +24,8 @@ let downloadUrl = `${API_URL}/pvdata/downloadhistory/`;
 let downloadFilter = '';
 let fileName = 'pvdata.csv';
 
+const regex = /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d/g;
+
 function downloadFile() {
   axios({
     url: `${downloadUrl}${downloadFilter}`,
@@ -159,12 +161,13 @@ function SearchCard(props) {
             type="datetime-local"
             placeholder="Data e Hora iniciais"
             value={defaultInitDate}
-            required
             onChange={(e) => {
-              onBeginTimeChange(`${e.target.value}.0-03:00`);
-              setPage(1);
               defaultInitDate = e.target.value;
-              downloadFilter = `?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
+              if (e.target.value.match(regex) && (e.target.value.length <= 19)) {
+                onBeginTimeChange(`${e.target.value}.0-03:00`);
+                setPage(1);
+                downloadFilter = `?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
+              }
             }}
           />
           <Input
@@ -173,12 +176,13 @@ function SearchCard(props) {
             type="datetime-local"
             placeholder="Data e hora finais"
             value={defaultEndDate}
-            required
             onChange={(e) => {
-              onEndTimeChange(`${e.target.value}.0-03:00`);
-              setPage(1);
               defaultEndDate = e.target.value;
-              downloadFilter = `?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
+              if (e.target.value.match(regex) && (e.target.value.length <= 19)) {
+                onEndTimeChange(`${e.target.value}.0-03:00`);
+                setPage(1);
+                downloadFilter = `?time_begin=${defaultInitDate}.0-03:00&time_end=${defaultEndDate}.0-03:00`;
+              }
             }}
           />
           <Button

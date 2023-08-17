@@ -254,10 +254,12 @@ def set_data(self, request_data):
     #                             current_alert=alert_definition('CR', string['string_number'], irradiance, string['current']),
     #                             string_number=string['string_number'])
     #     strings_ref.append(string_obj)
+    
+    temp_pv_estimate = convert_ambient_temp_to_pv(request_data['temperature_amb'], request_data['irradiance'])
 
     data = PVData.objects.create(timestamp=stringify_datetime(data_time),
                                 irradiance=request_data['irradiance'],
-                                temperature_pv=request_data['temperature_pv'],
+                                temperature_pv=temp_pv_estimate,
                                 temperature_amb=request_data['temperature_amb'],
                                 humidity=request_data['humidity'],
                                 wind_speed=request_data['wind_speed'],

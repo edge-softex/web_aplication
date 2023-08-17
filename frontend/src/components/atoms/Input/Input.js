@@ -20,6 +20,8 @@ function Input(props) {
         onChange={onChange}
         placeholder={placeholder}
         className="text_input"
+        step="1"
+        required
       />
     </div>
   );
