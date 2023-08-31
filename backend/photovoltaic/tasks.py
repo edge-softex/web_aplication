@@ -270,7 +270,7 @@ def set_data(self, request_data):
 
     # data.strings.set(strings_ref)
 
-    day = re.sub(r'\d\d:\d\d:\d\d.\d+', '00:00:00.000000', data_timestamp)
+    day = data_timestamp.split('T')[0] + "T00:00:00.000000-03:00"
     yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
 
     if request_data['generation'] is None and request_data['power_avg'] is None:
@@ -308,7 +308,7 @@ def set_data(self, request_data):
     yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
     yield_year.save()
 
-    # instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
+    estimated_instant_power_forecast.apply_async(args=[], kwargs={}, queue='run_models')
 
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
 def instant_power_forecast(self):
