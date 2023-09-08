@@ -254,6 +254,6 @@ def get_estimated_power(irr, pv_module_temp):
     :return: instantante PV power
     """
 
-    nominal_power = 5000 # Ajustar para o valor da mini usina
+    nominal_power = 25000 # Ajustar para o valor da mini usina
     return nominal_power * (irr/1000) * (1 - 0.0045*(pv_module_temp - 25)) * 0.90
     
