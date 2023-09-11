@@ -13,6 +13,7 @@ function getPowerData() {
     return axios.get(sessionURL, {
       headers: {
         'ngrok-skip-browser-warning': 'true',
+        'Bypass-Tunnel-Reminder': 'true',
         Authorization: `Token ${API_TOKEN}`,
       },
     }).then(({ data }) => {

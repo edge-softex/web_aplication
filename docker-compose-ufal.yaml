@@ -51,7 +51,7 @@ services:
     restart: always
     command : npm start
     environment:
-      - PUBLIC_URL="https://233e-200-17-112-81.ngrok-free.app/api"
+      - PUBLIC_URL="https://miniusinaback.loca.lt/api/"
     build:
       context: ./frontend/
       dockerfile: Dockerfile

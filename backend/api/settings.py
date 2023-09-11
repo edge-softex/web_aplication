@@ -69,11 +69,13 @@ MIDDLEWARE = [
 
 CORS_ALLOW_HEADERS = [
     'ngrok-skip-browser-warning',
+    'Bypass-Tunnel-Reminder',
     'Authorization'
 ]
 
 CORS_EXPOSE_HEADERS = [
     'ngrok-skip-browser-warning',
+    'Bypass-Tunnel-Reminder',
     'Authorization'
 ]
 

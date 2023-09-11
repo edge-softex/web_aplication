@@ -13,6 +13,7 @@ function App() {
     <div className="App">
       <Layout>
         <Routes>
+          <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/history" element={<Historic />} />
           <Route path="/settings" element={<Settings />} />
