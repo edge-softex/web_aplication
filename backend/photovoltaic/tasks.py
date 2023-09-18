@@ -353,8 +353,9 @@ def instant_power_forecast(self):
                                     t5=p5)
     
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
+
 def estimated_instant_power_forecast(self):
-    """ Function that uses a neural network model to process 120 minutes of irradiance and ambient temperature to forecasts 5 minute of the same input features. Then uses this forecasts to estimate the next 5 minutes of PV instant power. Finally saves it in the database.
+    """ Function that uses a neural network model (LSTM) to process 120 minutes of irradiance and ambient temperature to forecasts 5 minute of the same input features. Then uses this forecasts to estimate the next 5 minutes of PV instant power. Finally saves it in the database.
     """
     algs = AIAlgorithm.objects.filter(availability=True)
 
@@ -363,7 +364,7 @@ def estimated_instant_power_forecast(self):
     algorithm_object = registry.algorithms[algs[alg_index].id]
     
     if  algorithm_object.update == True:
-        algorithm_object.update_model("lstm/model.h5")
+        algorithm_object.update_model(algs[alg_index].path)
 
     tz = timezone(settings.TIME_ZONE)
     datetime_now = tz.localize(datetime.now())
@@ -380,8 +381,8 @@ def estimated_instant_power_forecast(self):
 
     required_input_lenght = len(algorithm_object.input_labels) * algorithm_object.input_steps
     if len(input_data) != required_input_lenght:
-        input_data = input_data + [0]*(required_input_lenght - len(input_data)) 
- 
+        input_data = input_data + [0.0]*(required_input_lenght - len(input_data)) 
+
     prediction = algorithm_object.compute_prediction(input_data)
         
     irr = prediction[:,0]
@@ -392,6 +393,7 @@ def estimated_instant_power_forecast(self):
     instant_power = [get_estimated_power(a, b) for a,b in zip(irr, pv_temp)]
     
     p1, p2, p3, p4, p5 = instant_power
+
     #Insert forecast into db
     pf = PowerForecast.objects.create(timestamp=timestamp[-1], power_avg=power_avg[-1], t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
     irrf = IrradianceForecast.objects.create(timestamp=datetime_now, t1=irr[0], t2=irr[1], t3=irr[2], t4=irr[3], t5=irr[4])
@@ -437,4 +439,3 @@ def model_updating(self):
     algorithm_object = registry.algorithms[algs[alg_index].id]
     
     algorithm_object.update = True
-
