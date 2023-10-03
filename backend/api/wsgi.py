@@ -16,17 +16,24 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'api.settings')
 application = get_wsgi_application()
 
 # AI registry
-from photovoltaic.ai import (LstmForecaster, AIRegistry)
+from photovoltaic.ai import (LstmForecaster, DlinearForecaster, AIRegistry)
 
 try:
     registry = AIRegistry()
     
-    lstm = LstmForecaster("lstm/model.h5")
-    # add to AI registry
-    registry.add_algorithm(algorithm_object=lstm,
-                            algorithm_name="lstm power forecaster",
-                            algorithm_description="Lstm model with simple pre- and post-processing, capable of retraining",
-                            algorithm_availability=True)
+    name="dlinear forecaster"
+    description="Dlinear model with simple pre- and post-processing, capable of retraining"
+    model_path = "dlinear/model"
+    # name="lstm forecaster"
+    # description="LSTM model with simple pre- and post-processing, capable of retraining"
+    # model_path = "lstm/model.h5"
+    model = DlinearForecaster(model_path)
+    registry.add_algorithm(algorithm_object=model,
+                            algorithm_name=name,
+                            algorithm_description=description,
+                            algorithm_availability=True,
+                            algorithm_path = model_path)
+
     print("Registry created sucessfully!")
 except Exception as e:
     print("Exception while loading the algorithms to the registry,", str(e))

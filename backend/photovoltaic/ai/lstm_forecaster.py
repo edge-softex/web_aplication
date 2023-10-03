@@ -19,7 +19,7 @@ class LstmForecaster:
     def preprocessing(self, input_data):
         input_data = np.array(input_data)
 
-        input_data[np.isnan(input_data)] = 0
+        input_data[np.isnan(input_data)] = 0.0
         input_data = input_data.reshape(1, int(input_data.shape[0]/len(self.input_labels)),len(self.input_labels), order='f')
         
         for i in range(len(self.input_labels)):

@@ -14,4 +14,5 @@ class AIAlgorithm(models.Model):
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=1000)
     availability = models.BooleanField(default=True)
+    path = models.CharField(max_length=1000, default="lstm/model.h5")
     created_at = models.DateTimeField(auto_now_add=True, blank=True)

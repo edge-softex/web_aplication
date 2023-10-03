@@ -5,13 +5,14 @@ class AIRegistry:
         self.algorithms = {}
 
     def add_algorithm(self, algorithm_object, algorithm_name,
-                    algorithm_description,algorithm_availability):
+                    algorithm_description,algorithm_availability, algorithm_path):
         
-        # get algorithm
-        database_object, algorithm_created = AIAlgorithm.objects.get_or_create(
-                name=algorithm_name,
-                description=algorithm_description,
-                availability=algorithm_availability)
+        defaults = {"name": algorithm_name,
+                "description": algorithm_description,
+                "availability": algorithm_availability,
+                "path": algorithm_path}
 
-        # add to registry
+        database_object, algorithm_created = AIAlgorithm.objects.update_or_create(id=1,
+                defaults=defaults)
+
         self.algorithms[database_object.id] = algorithm_object    
