@@ -31,6 +31,11 @@ function downloadFile() {
     url: `${downloadUrl}${downloadFilter}`,
     method: 'GET',
     responseType: 'blob',
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+      'Bypass-Tunnel-Reminder': 'true',
+      Authorization: `Token ${API_TOKEN}`,
+    },
   }).then((response) => {
     fileDownload(response.data, fileName);
   });
