@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import axios from 'axios';
-import { API_URL, API_TOKEN } from '../../network';
+import { API_URL, API_TOKEN } from '../../../network';
 
 import Input from '../../atoms/Input/Input';
 import Button from '../../atoms/Button/Button';
