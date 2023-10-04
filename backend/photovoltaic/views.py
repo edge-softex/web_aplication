@@ -45,7 +45,10 @@ from .serializers import (
     YieldMinuteSerializer,
     AlertThresholdSerializer,
     SettingaSerializer,
-    LogSerializer)
+    LogSerializer,
+    AmbientTemperatureForecastSerializer,
+    IrradianceForecastSerializer,
+    PVModuleTemperatureForecastSerializer)
 
 from .models import (
     PVData,
@@ -57,7 +60,10 @@ from .models import (
     YieldMinute,
     AlertThreshold,
     Settings,
-    Log)
+    Log,
+    AmbientTemperatureForecast,
+    IrradianceForecast,
+    PVModuleTemperatureForecast)
 
 class DynamicPagination(PageNumberPagination):
     page_size = 30
@@ -1035,3 +1041,21 @@ class ExternalAPIViweSet(viewsets.ViewSet):
             return Response(status=400)
 
         return Response(status=200)
+    
+class AmbientTemperatureForecastViewSet(viewsets.ModelViewSet):
+
+    queryset = AmbientTemperatureForecast.objects.all()
+    serializer_class = AmbientTemperatureForecastSerializer
+    pagination_class = DynamicPagination
+
+class IrradianceForecastViewSet(viewsets.ModelViewSet):
+
+    queryset = IrradianceForecast.objects.all()
+    serializer_class = IrradianceForecastSerializer
+    pagination_class = DynamicPagination
+
+class PVModuleTemperatureForecastViewSet(viewsets.ModelViewSet):
+
+    queryset = PVModuleTemperatureForecast.objects.all()
+    serializer_class = PVModuleTemperatureForecastSerializer
+    pagination_class = DynamicPagination

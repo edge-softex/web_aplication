@@ -15,7 +15,10 @@ from .models import (
     AlertThreshold,
     Settings,
     Log,
-    AIAlgorithm
+    AIAlgorithm,
+    AmbientTemperatureForecast,
+    IrradianceForecast,
+    PVModuleTemperatureForecast
 )
 
 class UserSerializer(serializers.ModelSerializer):
@@ -132,3 +135,18 @@ class AIAlgorithmSerializer(serializers.ModelSerializer):
         model = AIAlgorithm
         read_only_fields = ("id", "name", "description","created_at")
         fields = ("id", "name", "description", "availability", "update",  "created_at")
+
+class AmbientTemperatureForecastSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = AmbientTemperatureForecast
+        fields = '__all__'
+
+class IrradianceForecastSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = IrradianceForecast
+        fields = '__all__'
+
+class PVModuleTemperatureForecastSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = PVModuleTemperatureForecast
+        fields = '__all__'
