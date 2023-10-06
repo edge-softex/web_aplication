@@ -21,13 +21,14 @@ from photovoltaic.ai import (LstmForecaster, DlinearForecaster, AIRegistry)
 try:
     registry = AIRegistry()
     
-    name="dlinear forecaster"
-    description="Dlinear model with simple pre- and post-processing, capable of retraining"
-    model_path = "dlinear/model"
-    # name="lstm forecaster"
-    # description="LSTM model with simple pre- and post-processing, capable of retraining"
-    # model_path = "lstm/model.h5"
-    model = DlinearForecaster(model_path)
+    # name="dlinear forecaster"
+    # description="Dlinear model with simple pre- and post-processing, capable of retraining"
+    # model_path = "dlinear/model"
+    name="lstm forecaster"
+    description="LSTM model with simple pre- and post-processing, capable of retraining"
+    model_path = "lstm/model.h5"
+    #model = DlinearForecaster(model_path)
+    model = LstmForecaster(model_path)
     registry.add_algorithm(algorithm_object=model,
                             algorithm_name=name,
                             algorithm_description=description,
