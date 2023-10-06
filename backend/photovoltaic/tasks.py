@@ -395,10 +395,10 @@ def estimated_instant_power_forecast(self):
     p1, p2, p3, p4, p5 = instant_power
 
     #Insert forecast into db
-    # pf = PowerForecast.objects.create(timestamp=timestamp[-1], power_avg=power_avg[-1], t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
-    # irrf = IrradianceForecast.objects.create(timestamp=timestamp[-1], t1=irr[0], t2=irr[1], t3=irr[2], t4=irr[3], t5=irr[4])
-    # ambtempf = AmbientTemperatureForecast.objects.create(timestamp=timestamp[-1], t1=amb_temp[0], t2=amb_temp[1], t3=amb_temp[2], t4=amb_temp[3], t5=amb_temp[4])
-    # pvtempf = PVModuleTemperatureForecast.objects.create(timestamp=timestamp[-1], t1=pv_temp[0], t2=pv_temp[1], t3=pv_temp[2], t4=pv_temp[3], t5=pv_temp[4])
+    pf = PowerForecast.objects.create(timestamp=timestamp[-1], power_avg=power_avg[-1], t1=p1, t2=p2, t3=p3, t4=p4, t5=p5)
+    irrf = IrradianceForecast.objects.create(timestamp=timestamp[-1], t1=irr[0], t2=irr[1], t3=irr[2], t4=irr[3], t5=irr[4])
+    ambtempf = AmbientTemperatureForecast.objects.create(timestamp=timestamp[-1], t1=amb_temp[0], t2=amb_temp[1], t3=amb_temp[2], t4=amb_temp[3], t5=amb_temp[4])
+    pvtempf = PVModuleTemperatureForecast.objects.create(timestamp=timestamp[-1], t1=pv_temp[0], t2=pv_temp[1], t3=pv_temp[2], t4=pv_temp[3], t5=pv_temp[4])
 
     
 @shared_task(bind=True, max_retries=3, on_failure=createLog)
